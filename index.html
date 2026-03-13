@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naman Ramphale - Full-Stack & iOS Developer</title>
+    <title>Naman Ramphale — Full-Stack & iOS Developer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -17,12 +17,14 @@
             --starlight-cyan: #00F5FF;
             --star-gold: #FFD700;
             --moonlight: #E8F4FD;
-            --card-glass: rgba(255, 255, 255, 0.04);
-            --border-cyan: rgba(0, 245, 255, 0.4);
-            --border-gold: rgba(255, 215, 0, 0.4);
+            --card-glass: rgba(255,255,255,0.04);
+            --border-cyan: rgba(0,245,255,0.35);
+            --border-gold: rgba(255,215,0,0.4);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
+
         body {
             background-color: var(--space-black);
             color: var(--moonlight);
@@ -31,442 +33,1178 @@
             cursor: none;
         }
 
-        /* --- Global Space Theme --- */
+        /* ── CANVAS ── */
         #space-canvas {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 0;
+            pointer-events: none;
         }
-        main {
-            position: relative;
-            z-index: 1;
-        }
-        .custom-cursor {
+
+        /* ── CUSTOM CURSOR ── */
+        #cursor {
             position: fixed;
             pointer-events: none;
-            z-index: 9999;
+            z-index: 99999;
+            top: 0; left: 0;
+            width: 30px; height: 30px;
             transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out;
-            will-change: transform;
+            transition: width .2s, height .2s, box-shadow .2s;
         }
-        .cursor-reticle { width: 30px; height: 30px; border: 1.5px solid var(--starlight-cyan); border-radius: 50%; position: relative; transition: all 0.2s ease; }
-        .cursor-dot { width: 4px; height: 4px; background: var(--starlight-cyan); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .cursor-reticle::before, .cursor-reticle::after { content: ''; position: absolute; background: var(--starlight-cyan); }
-        .cursor-reticle::before { width: 1px; height: 7px; top: -8px; left: calc(50% - 0.5px); }
-        .cursor-reticle::after { width: 1px; height: 7px; bottom: -8px; left: calc(50% - 0.5px); }
-        body:hover .custom-cursor { opacity: 1; }
-        a:hover ~ .custom-cursor .cursor-reticle, button:hover ~ .custom-cursor .cursor-reticle {
-            transform: scale(1.5);
-            box-shadow: 0 0 15px var(--starlight-cyan);
+        #cursor .ring {
+            width: 30px; height: 30px;
+            border: 1.5px solid var(--starlight-cyan);
+            border-radius: 50%;
+            position: absolute;
+            top: 0; left: 0;
+            transition: all .2s;
+        }
+        #cursor .dot {
+            width: 4px; height: 4px;
+            background: var(--starlight-cyan);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+        }
+        /* crosshair lines */
+        #cursor .ring::before,
+        #cursor .ring::after {
+            content: '';
+            position: absolute;
+            background: var(--starlight-cyan);
+        }
+        #cursor .ring::before { width: 1px; height: 8px; top: -10px; left: calc(50% - .5px); }
+        #cursor .ring::after  { width: 1px; height: 8px; bottom: -10px; left: calc(50% - .5px); }
+        body.cursor-hover #cursor .ring {
+            transform: scale(1.8);
+            box-shadow: 0 0 12px var(--starlight-cyan);
+        }
+        @media (max-width: 768px) { body { cursor: auto; } #cursor { display: none; } }
+
+        /* ── MAIN WRAPPER ── */
+        main { position: relative; z-index: 1; }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed; top: 0; width: 100%;
+            padding: 18px 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000;
+            transition: background .4s, backdrop-filter .4s;
+        }
+        nav.scrolled {
+            background: rgba(3,2,10,.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-cyan);
+        }
+        .nav-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--starlight-cyan);
+            text-shadow: 0 0 10px rgba(0,245,255,.6);
+            text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a {
+            font-family: 'Orbitron', sans-serif;
+            font-size: .75rem;
+            color: var(--moonlight);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            transition: color .3s;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1px;
+            background: var(--starlight-cyan);
+            transition: width .3s;
+        }
+        .nav-links a:hover { color: var(--starlight-cyan); }
+        .nav-links a:hover::after { width: 100%; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .hamburger span { width: 24px; height: 2px; background: var(--starlight-cyan); transition: all .3s; }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
         }
 
-        /* --- Typography & Animations --- */
-        h1, h2, h3 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
-        .glow-cyan { text-shadow: 0 0 10px var(--starlight-cyan), 0 0 20px var(--starlight-cyan), 0 0 40px rgba(0,245,255,0.5); }
+        /* ── TYPOGRAPHY HELPERS ── */
+        h1,h2,h3 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+        .glow-cyan { text-shadow: 0 0 10px var(--starlight-cyan), 0 0 25px rgba(0,245,255,.5); }
         .glow-gold { text-shadow: 0 0 10px var(--star-gold), 0 0 20px var(--star-gold); }
-        .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, transform; }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
 
-        /* --- Reusable Components --- */
+        /* ── SCROLL REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(45px);
+            transition: opacity .8s ease-out, transform .8s ease-out;
+            will-change: opacity, transform;
+        }
+        .reveal.visible { opacity: 1 !important; transform: translateY(0) !important; }
+
+        /* ── GLASS CARD ── */
         .glass-card {
             background: var(--card-glass);
             border: 1px solid var(--border-cyan);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 40px;
-            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 36px;
+            transition: border-color .3s, box-shadow .3s;
         }
-        .glass-card:hover { border-color: var(--starlight-cyan); box-shadow: 0 0 30px rgba(0, 245, 255, 0.2); }
+        .glass-card:hover {
+            border-color: var(--starlight-cyan);
+            box-shadow: 0 0 35px rgba(0,245,255,.15);
+        }
+
+        /* ── BUTTONS ── */
         .btn {
             font-family: 'Orbitron', sans-serif;
-            padding: 12px 28px; text-decoration: none; font-weight: 700; border-radius: 5px;
-            transition: all 0.3s ease; margin: 0 10px; position: relative; overflow: hidden; border: 2px solid transparent;
+            font-size: .8rem;
+            font-weight: 700;
+            padding: 13px 28px;
+            text-decoration: none;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all .3s;
+            display: inline-block;
+            letter-spacing: .05em;
+            position: relative;
+            overflow: hidden;
         }
-        .btn-primary { background-color: var(--starlight-cyan); color: var(--space-black); border-color: var(--starlight-cyan); }
-        .btn-primary:hover { background-color: transparent; color: var(--starlight-cyan); box-shadow: 0 0 20px var(--starlight-cyan); }
-        .btn-secondary { background-color: var(--nebula-purple); color: var(--moonlight); }
-        .btn-secondary:hover { box-shadow: 0 0 25px var(--nebula-purple); }
-        
-        /* --- Hero --- */
-        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; }
-        .hero-nebula-glow { position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(123,47,190,0.12) 0%, rgba(123,47,190,0) 70%); animation: nebulaPulse 6s ease-in-out infinite; }
-        @keyframes nebulaPulse { 50% { transform: scale(1.15); opacity: 0.8; } }
-        .hero-content h1 { font-size: clamp(3rem, 7vw, 5.5rem); animation: nameGlitch 8s infinite; }
-        @keyframes nameGlitch { 0%, 95%, 100% { clip-path: inset(0 0 0 0); } 96% { clip-path: inset(0 0 70% 0); transform: translateX(-5px); } 97% { clip-path: inset(30% 0 30% 0); transform: translateX(5px); } 98% { clip-path: inset(70% 0 0 0); transform: translateX(-3px); } 99% { clip-path: inset(0 0 0 0); } }
-        .typewriter-container { font-family: 'Exo 2', sans-serif; font-weight: 600; font-size: 1.5rem; color: var(--starlight-cyan); min-height: 2.2rem; }
-        .typewriter-container .cursor { animation: blink 0.7s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-        .hero-buttons { margin-top: 40px; }
-        .scroll-prompt { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-family: 'Orbitron'; font-size: 10px; color: var(--starlight-cyan); animation: bounce 1.5s infinite; }
-        @keyframes bounce { 50% { transform: translate(-50%, 8px); } }
+        .btn-primary {
+            background: transparent;
+            border-color: var(--starlight-cyan);
+            color: var(--starlight-cyan);
+        }
+        .btn-primary:hover {
+            background: var(--starlight-cyan);
+            color: var(--space-black);
+            box-shadow: 0 0 25px rgba(0,245,255,.5);
+        }
+        .btn-secondary {
+            background: var(--nebula-purple);
+            color: var(--moonlight);
+            border-color: var(--nebula-purple);
+        }
+        .btn-secondary:hover { box-shadow: 0 0 25px rgba(123,47,190,.7); }
 
-        /* --- Sections --- */
-        .section { padding: 140px 8%; }
-        .section-title { font-size: clamp(2rem, 5vw, 3rem); text-align: center; margin-bottom: 80px; position: relative; }
-        .section-title::after { content: ''; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background: var(--starlight-cyan); transition: width 0.8s ease-out; }
+        /* ── SECTION BASE ── */
+        .section { padding: 120px 8%; position: relative; }
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            text-align: center;
+            margin-bottom: 70px;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -14px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 2px;
+            background: var(--starlight-cyan);
+            transition: width .9s ease-out .2s;
+        }
         .section-title.visible::after { width: 80px; }
 
-        /* --- About --- */
-        #about .about-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 60px; align-items: center; }
-        .hud-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .stat-item { border: 1px solid var(--border-cyan); border-radius: 50%; aspect-ratio: 1/1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .stat-number { font-family: 'Orbitron'; font-size: 2.5rem; color: var(--star-gold); }
-        .stat-label { font-size: 0.8rem; text-align: center; text-transform: uppercase; color: var(--starlight-cyan); }
-        .bio-card { border-color: rgba(0,245,255,0.2); background: rgba(0,245,255,0.03); }
-        .coords-strip { margin-top: 50px; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--starlight-cyan); text-align: center; }
+        /* ─────────────────────────────────────────
+           HERO
+        ───────────────────────────────────────── */
+        #hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        .hero-nebula {
+            position: absolute;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(123,47,190,.14) 0%, transparent 70%);
+            animation: nebulaPulse 7s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes nebulaPulse {
+            0%,100% { transform: scale(1); opacity: .7; }
+            50% { transform: scale(1.18); opacity: 1; }
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 800px; padding: 0 20px; }
+        .hero-content h1 {
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            line-height: 1.1;
+            margin-bottom: 20px;
+            animation: nameGlitch 9s infinite;
+        }
+        @keyframes nameGlitch {
+            0%,93%,100% { clip-path: inset(0 0 0 0); transform: none; }
+            94% { clip-path: inset(5% 0 75% 0); transform: translateX(-5px); }
+            95% { clip-path: inset(30% 0 30% 0); transform: translateX(5px); }
+            96% { clip-path: inset(75% 0 5% 0); transform: translateX(-3px); }
+            97% { clip-path: inset(0 0 0 0); transform: none; }
+        }
+        .typewriter-wrap {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--starlight-cyan);
+            min-height: 2rem;
+            margin-bottom: 40px;
+        }
+        .cursor-blink { animation: blink .7s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .hero-btns { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .scroll-prompt {
+            position: absolute;
+            bottom: 28px; left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: .65rem;
+            color: var(--starlight-cyan);
+            letter-spacing: .15em;
+            animation: scrollBounce 1.6s ease-in-out infinite;
+        }
+        @keyframes scrollBounce {
+            0%,100% { transform: translateX(-50%) translateY(0); }
+            50%      { transform: translateX(-50%) translateY(9px); }
+        }
 
-        /* --- Skills --- */
-        #skills .skills-container { max-width: 1000px; margin: auto; position: relative; }
-        #skill-constellation { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s 1s; }
-        .skill-category { margin-bottom: 40px; }
-        .skill-category h3 { color: var(--star-gold); margin-bottom: 20px; font-size: 1.2rem; }
-        .skill-tags { display: flex; flex-wrap: wrap; gap: 12px; }
-        .skill-tag { background: rgba(0,245,255,0.06); border: 1px solid rgba(0,245,255,0.3); color: var(--moonlight); font-family: 'JetBrains Mono'; border-radius: 20px; padding: 6px 14px; transition: all 0.3s ease; transform: scale(0); opacity: 0; animation: powerOn 0.5s forwards; }
-        .skill-tag:hover { background: rgba(0,245,255,0.2); box-shadow: 0 0 15px rgba(0,245,255,0.6); transform: scale(1.08); }
-        @keyframes powerOn { to { transform: scale(1); opacity: 1; } }
+        /* ─────────────────────────────────────────
+           ABOUT
+        ───────────────────────────────────────── */
+        #about .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .hud-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .stat-item {
+            border: 1px solid var(--border-cyan);
+            border-radius: 50%;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            transition: box-shadow .3s;
+        }
+        .stat-item:hover { box-shadow: 0 0 20px rgba(0,245,255,.25); }
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            color: var(--star-gold);
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: .72rem;
+            color: var(--starlight-cyan);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-top: 6px;
+        }
+        .bio-card p { line-height: 1.9; font-size: 1.05rem; }
+        .coords-strip {
+            margin-top: 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: .72rem;
+            color: var(--starlight-cyan);
+            text-align: center;
+            letter-spacing: .05em;
+        }
 
-        /* --- Projects --- */
-        .mission-card { margin-bottom: 40px; transition: all 0.3s ease; }
-        .mission-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .mission-badge { font-family: 'Orbitron'; padding: 4px 10px; border-radius: 5px; font-size: 0.9rem; }
-        .mission-id { background: var(--starlight-cyan); color: var(--space-black); }
-        .mission-status { background: var(--star-gold); color: var(--space-black); }
-        .mission-flagship .hero-project-grid { display: grid; grid-template-columns: 1fr 320px; gap: 40px; }
-        .mission-features { list-style: none; margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .mission-features li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        .mission-features i { color: var(--starlight-cyan); }
-        .iphone-mockup { width: 100%; aspect-ratio: 9/19.5; background: #111; border-radius: 40px; border: 8px solid #222; padding: 8px; box-shadow: 0 0 40px rgba(0,245,255,0.3), 0 0 80px rgba(0,245,255,0.1); animation: phoneBob 4s ease-in-out infinite; }
-        @keyframes phoneBob { 50% { transform: translateY(-12px); } }
-        .iphone-screen { width: 100%; height: 100%; border-radius: 32px; overflow: hidden; position: relative; }
-        .carousel-slide { position: absolute; top:0;left:0;width:100%;height:100%;opacity:0;transition:opacity 1s ease-in-out; }
+        /* ─────────────────────────────────────────
+           SKILLS
+        ───────────────────────────────────────── */
+        #skills { background: rgba(8,11,26,.5); }
+        .skills-inner { max-width: 1000px; margin: auto; }
+        .skill-category { margin-bottom: 38px; }
+        .skill-category h3 {
+            margin-bottom: 16px;
+            font-size: 1rem;
+            letter-spacing: .08em;
+        }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .skill-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem;
+            background: rgba(0,245,255,.06);
+            border: 1px solid rgba(0,245,255,.3);
+            color: var(--moonlight);
+            border-radius: 20px;
+            padding: 6px 14px;
+            transition: all .3s;
+            opacity: 0;
+            transform: scale(.7);
+        }
+        .skill-tag.lit {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity .4s ease-out, transform .4s cubic-bezier(.34,1.56,.64,1), background .3s, box-shadow .3s;
+        }
+        .skill-tag:hover {
+            background: rgba(0,245,255,.22);
+            box-shadow: 0 0 14px rgba(0,245,255,.6);
+            transform: scale(1.09);
+        }
+
+        /* ─────────────────────────────────────────
+           PROJECTS
+        ───────────────────────────────────────── */
+        .mission-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: .75rem;
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-weight: 700;
+        }
+        .badge-id   { background: var(--starlight-cyan); color: var(--space-black); }
+        .badge-flag { background: var(--star-gold); color: var(--space-black); }
+        .badge-live { background: #00ff7f22; border: 1px solid #00ff7f; color: #00ff7f; display: flex; align-items: center; gap: 6px; }
+        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #00ff7f; animation: livePulse 1.2s infinite; }
+        @keyframes livePulse { 50% { box-shadow: 0 0 8px #00ff7f; opacity: .5; } }
+
+        /* Flagship */
+        .flagship-card { margin-bottom: 50px; }
+        .flagship-inner {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 40px;
+            align-items: start;
+        }
+        .flagship-card h3 { font-size: 1.5rem; margin: 16px 0 10px; color: var(--starlight-cyan); }
+        .flagship-card p { line-height: 1.8; }
+        .mission-header { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+        .feature-list { list-style: none; margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .feature-list li { font-size: .88rem; display: flex; align-items: center; gap: 8px; }
+        .feature-list i { color: var(--starlight-cyan); font-size: .85rem; }
+
+        /* iPhone mockup */
+        .iphone-wrap {
+            width: 100%;
+            animation: phoneBob 4s ease-in-out infinite;
+        }
+        @keyframes phoneBob {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-14px); }
+        }
+        .iphone-frame {
+            width: 100%;
+            aspect-ratio: 9/19.5;
+            background: #111;
+            border-radius: 42px;
+            border: 7px solid #2a2a2a;
+            box-shadow: 0 0 40px rgba(0,245,255,.3), 0 0 80px rgba(0,245,255,.1), inset 0 0 10px rgba(0,0,0,.5);
+            overflow: hidden;
+            position: relative;
+        }
+        .carousel-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity .9s ease-in-out;
+            background: #111;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(0,245,255,.4);
+            font-family: 'Orbitron', sans-serif;
+            font-size: .7rem;
+            text-align: center;
+            padding: 10px;
+        }
         .carousel-slide.active { opacity: 1; }
         .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
-        .other-missions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .other-mission-card { padding: 30px; }
-        .mission-highlights { font-size: 0.9rem; color: var(--text-secondary); margin-top: 15px; }
-        .tech-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-        .tech-pill { font-family: 'JetBrains Mono'; font-size: 0.8rem; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); color: var(--star-gold); padding: 4px 10px; border-radius: 15px; }
-        
-        /* --- Timeline --- */
-        #timeline { padding-bottom: 200px; }
-        .timeline-container { max-width: 800px; margin: auto; position: relative; }
-        .timeline-container::after { content: ''; position: absolute; width: 2px; background: rgba(0,245,255,0.4); top: 0; bottom: 0; left: 50%; margin-left: -1px; }
-        .timeline-item { padding: 10px 40px; position: relative; width: 50%; opacity: 0; transition: opacity 0.5s; }
-        .timeline-item.visible { opacity: 1; }
-        .timeline-item:nth-child(odd) { left: 0; transform: translateX(-40px); }
-        .timeline-item:nth-child(even) { left: 50%; transform: translateX(40px); }
-        .timeline-item.visible { transform: translateX(0); }
-        .timeline-item::after { content: '🚀'; position: absolute; width: 25px; height: 25px; right: -12.5px; top: 15px; z-index: 1; font-size: 1.2rem; transform: rotate(90deg); }
-        .timeline-item:nth-child(even)::after { left: -12.5px; transform: rotate(-90deg); }
-        .timeline-content { padding: 20px; border-radius: 10px; }
-        .timeline-content h3 { color: var(--star-gold); }
+        .carousel-dots {
+            display: flex; justify-content: center; gap: 8px; margin-top: 12px;
+        }
+        .carousel-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: rgba(0,245,255,.3);
+            border: 1px solid var(--starlight-cyan);
+            cursor: pointer;
+            transition: background .3s;
+        }
+        .carousel-dot.active { background: var(--starlight-cyan); }
 
-        /* --- Contact --- */
-        .contact-container { max-width: 700px; margin: auto; text-align: center; }
-        .contact-readouts { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; font-family: 'Orbitron'; font-size: 0.9rem; }
-        .contact-readouts span { color: var(--starlight-cyan); }
-        .contact-form .form-group { position: relative; margin-bottom: 25px; }
-        .form-input { width: 100%; padding: 10px 0; background: transparent; border: none; border-bottom: 1px solid var(--border-cyan); color: var(--moonlight); font-size: 1rem; }
-        .form-input:focus { outline: none; border-bottom-color: var(--starlight-cyan); }
-        .form-label { position: absolute; top: 10px; left: 0; color: var(--moonlight); transition: all 0.3s; pointer-events: none; }
-        .form-input:focus ~ .form-label, .form-input:valid ~ .form-label { top: -15px; font-size: 0.8rem; color: var(--starlight-cyan); }
-        #contact .btn { width: 100%; background: linear-gradient(135deg, var(--nebula-purple), var(--starlight-cyan)); border: none; }
-        
-        /* --- Footer --- */
-        footer { padding: 50px 8%; text-align: center; color: var(--moonlight); }
-        .back-to-top { position: fixed; bottom: 30px; right: 30px; font-size: 2rem; z-index: 10; transition: transform 0.3s; }
-        .back-to-top:hover { transform: translateY(-8px); }
+        /* Tech pills */
+        .tech-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+        .tech-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .75rem;
+            background: rgba(255,215,0,.08);
+            border: 1px solid rgba(255,215,0,.3);
+            color: var(--star-gold);
+            padding: 4px 12px;
+            border-radius: 14px;
+            transition: all .3s;
+        }
+        .tech-pill:hover { background: rgba(255,215,0,.2); box-shadow: 0 0 10px rgba(255,215,0,.4); }
 
-        @media (max-width: 768px) {
-            body { cursor: auto; }
-            .custom-cursor { display: none; }
-            #about .about-grid, .mission-flagship .hero-project-grid { grid-template-columns: 1fr; }
-            .timeline-container::after { left: 15px; }
-            .timeline-item, .timeline-item:nth-child(even) { width: 100%; left: 0; padding-left: 60px; }
-            .timeline-item::after, .timeline-item:nth-child(even)::after { left: 5px; transform: rotate(90deg); }
+        /* Other missions grid */
+        .other-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+        }
+        .other-card h3 { font-size: .95rem; margin-bottom: 10px; }
+        .other-card p  { font-size: .88rem; line-height: 1.75; color: rgba(232,244,253,.75); }
+
+        /* ─────────────────────────────────────────
+           TIMELINE
+        ───────────────────────────────────────── */
+        #timeline { background: rgba(8,11,26,.5); }
+        .timeline-wrap {
+            max-width: 800px;
+            margin: auto;
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0; bottom: 0;
+            width: 2px;
+            background: rgba(0,245,255,.25);
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: calc(50% + 40px);
+            position: relative;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity .7s ease-out, transform .7s ease-out;
+        }
+        .timeline-item:nth-child(even) {
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: calc(50% + 40px);
+            transform: translateX(40px);
+        }
+        .timeline-item.visible { opacity: 1; transform: translateX(0); }
+        .timeline-node {
+            position: absolute;
+            left: 50%;
+            top: 18px;
+            width: 16px; height: 16px;
+            border: 2px solid var(--starlight-cyan);
+            border-radius: 50%;
+            background: var(--space-black);
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(0,245,255,.5);
+            transition: box-shadow .3s;
+        }
+        .timeline-item:hover .timeline-node { box-shadow: 0 0 20px rgba(0,245,255,.9); }
+        .timeline-card { padding: 18px 24px; max-width: 300px; }
+        .timeline-card h3 { color: var(--star-gold); font-size: .9rem; margin-bottom: 6px; }
+        .timeline-card p  { font-size: .85rem; color: rgba(232,244,253,.75); }
+
+        /* ─────────────────────────────────────────
+           CONTACT
+        ───────────────────────────────────────── */
+        .contact-wrap { max-width: 680px; margin: auto; }
+        .contact-readouts {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px 40px;
+            margin-bottom: 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: .75rem;
+        }
+        .contact-readouts .label { color: var(--starlight-cyan); }
+        .form-group { position: relative; margin-bottom: 28px; }
+        .form-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(0,245,255,.3);
+            color: var(--moonlight);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1rem;
+            padding: 10px 0;
+            outline: none;
+            transition: border-color .3s;
+        }
+        .form-input:focus { border-bottom-color: var(--starlight-cyan); }
+        textarea.form-input { resize: none; height: 80px; }
+        .form-label {
+            position: absolute;
+            top: 10px; left: 0;
+            color: rgba(232,244,253,.5);
+            font-family: 'Exo 2', sans-serif;
+            font-size: .95rem;
+            pointer-events: none;
+            transition: all .3s;
+        }
+        .form-input:focus ~ .form-label,
+        .form-input:not(:placeholder-shown) ~ .form-label {
+            top: -14px;
+            font-size: .75rem;
+            color: var(--starlight-cyan);
+        }
+        .btn-transmit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--nebula-purple), var(--starlight-cyan));
+            border: none;
+            color: var(--space-black);
+            font-weight: 900;
+            padding: 16px;
+            margin-top: 10px;
+        }
+        .btn-transmit:hover { box-shadow: 0 0 30px rgba(0,245,255,.4); transform: translateY(-2px); }
+        .social-row { display: flex; justify-content: center; gap: 20px; margin-top: 36px; }
+        .social-btn {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--border-cyan);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--starlight-cyan);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all .3s;
+        }
+        .social-btn:hover {
+            box-shadow: 0 0 20px rgba(0,245,255,.5);
+            border-color: var(--starlight-cyan);
+            transform: translateY(-3px);
+        }
+
+        /* ─────────────────────────────────────────
+           FOOTER
+        ───────────────────────────────────────── */
+        footer {
+            padding: 40px 8%;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: .7rem;
+            color: rgba(0,245,255,.55);
+            border-top: 1px solid rgba(0,245,255,.1);
+            position: relative; z-index: 1;
+        }
+        .back-top {
+            position: fixed;
+            bottom: 28px; right: 28px;
+            font-size: 1.8rem;
+            z-index: 1000;
+            text-decoration: none;
+            transition: transform .3s;
+            filter: drop-shadow(0 0 6px rgba(0,245,255,.4));
+        }
+        .back-top:hover { transform: translateY(-8px); }
+
+        /* ─────────────────────────────────────────
+           RESPONSIVE
+        ───────────────────────────────────────── */
+        @media (max-width: 900px) {
+            #about .about-grid { grid-template-columns: 1fr; }
+            .flagship-inner { grid-template-columns: 1fr; }
+            .iphone-wrap { max-width: 240px; margin: auto; }
+            .feature-list { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .section { padding: 90px 5%; }
+            .timeline-line { left: 20px; }
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                justify-content: flex-start;
+                padding: 0 0 0 55px;
+                transform: translateX(0);
+            }
+            .timeline-node { left: 20px; }
+            .other-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="custom-cursor"><div class="cursor-reticle"><div class="cursor-dot"></div></div></div>
-    <canvas id="space-canvas"></canvas>
-    
-    <main>
-        <section id="hero" class="hero">
-            <div class="hero-nebula-glow"></div>
-            <div class="hero-content reveal">
-                <h1 class="glow-cyan">Naman Ramphale</h1>
-                <div class="typewriter-container">
-                    <span id="typewriter-text"></span><span class="cursor">|</span>
+
+<!-- Custom cursor -->
+<div id="cursor"><div class="ring"><div class="dot"></div></div></div>
+
+<!-- Space canvas -->
+<canvas id="space-canvas"></canvas>
+
+<!-- Nav -->
+<nav id="navbar">
+    <a class="nav-logo" href="#hero">NR.DEV</a>
+    <ul class="nav-links">
+        <li><a href="#about">Brief</a></li>
+        <li><a href="#skills">Systems</a></li>
+        <li><a href="#projects">Missions</a></li>
+        <li><a href="#timeline">Log</a></li>
+        <li><a href="#contact">Channel</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+<main>
+
+    <!-- ══ HERO ══ -->
+    <section id="hero">
+        <div class="hero-nebula"></div>
+        <div class="hero-content">
+            <h1 class="glow-cyan">Naman Ramphale</h1>
+            <div class="typewriter-wrap">
+                <span id="tw-text"></span><span class="cursor-blink">|</span>
+            </div>
+            <div class="hero-btns">
+                <a href="#projects" class="btn btn-primary">Explore Missions</a>
+                <a href="#" class="btn btn-secondary">Download Resume</a>
+            </div>
+        </div>
+        <div class="scroll-prompt">▼ SCROLL TO EXPLORE ▼</div>
+    </section>
+
+    <!-- ══ ABOUT ══ -->
+    <section id="about" class="section">
+        <h2 class="section-title reveal glow-cyan">Mission Brief</h2>
+        <div class="about-grid">
+            <div class="hud-stats reveal">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="3">0</div>
+                    <div class="stat-label">Years in Orbit</div>
                 </div>
-                <div class="hero-buttons">
-                    <a href="#projects" class="btn btn-primary">Explore Missions</a>
-                    <a href="#" class="btn btn-secondary">Download Resume</a>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="10">0</div>
+                    <div class="stat-label">Missions Done</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="5">0</div>
+                    <div class="stat-label">Systems Mastered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="1">0</div>
+                    <div class="stat-label">Live App Deployed</div>
                 </div>
             </div>
-            <div class="scroll-prompt">▼ SCROLL TO EXPLORE ▼</div>
-        </section>
+            <div class="bio-card glass-card reveal">
+                <p>I'm a passionate Full-Stack and iOS Developer with expertise in building scalable web platforms and native mobile applications. I specialize in <strong style="color:var(--starlight-cyan)">Swift/SwiftUI</strong> for iOS, <strong style="color:var(--starlight-cyan)">ASP.NET Core</strong> for backend, and <strong style="color:var(--starlight-cyan)">Firebase</strong> for real-time data. I love turning complex ideas into elegant, user-friendly products that make a real impact.</p>
+            </div>
+        </div>
+        <div class="coords-strip reveal">
+            📡 namanramphale2115@gmail.com &nbsp;|&nbsp; 📱 +91-9106479647 &nbsp;|&nbsp; 🌍 Surat, Gujarat, India
+        </div>
+    </section>
 
-        <section id="about" class="section">
-            <h2 class="section-title reveal glow-cyan">Mission Brief</h2>
-            <div class="about-grid">
-                <div class="hud-stats reveal">
-                    <div class="stat-item"><div class="stat-number" data-count="3">0</div><div class="stat-label">Years In Orbit</div></div>
-                    <div class="stat-item"><div class="stat-number" data-count="10">0</div><div class="stat-label">Missions Done</div></div>
-                    <div class="stat-item"><div class="stat-number" data-count="5">0</div><div class="stat-label">Systems Mastered</div></div>
-                    <div class="stat-item"><div class="stat-number" data-count="1">0</div><div class="stat-label">Live App Deployed</div></div>
-                </div>
-                <div class="bio-card glass-card reveal">
-                    <p>I'm a passionate Full-Stack and iOS Developer with expertise in building scalable web platforms and native mobile applications. I specialize in Swift/SwiftUI for iOS, ASP.NET Core for backend, and Firebase for real-time data. I love turning complex ideas into elegant, user-friendly products.</p>
+    <!-- ══ SKILLS ══ -->
+    <section id="skills" class="section">
+        <h2 class="section-title reveal glow-gold">Systems Online</h2>
+        <div class="skills-inner">
+            <div class="skill-category reveal">
+                <h3 class="glow-gold">★ iOS Development</h3>
+                <div class="skill-tags">
+                    <span class="skill-tag">Swift</span><span class="skill-tag">SwiftUI</span><span class="skill-tag">UIKit</span>
+                    <span class="skill-tag">Xcode</span><span class="skill-tag">Core Data</span><span class="skill-tag">AVFoundation</span>
+                    <span class="skill-tag">Push Notifications</span><span class="skill-tag">App Store Connect</span>
                 </div>
             </div>
-            <div class="coords-strip reveal">📡 namanramphale2115@gmail.com | 📱 +91-9106479647 | 🌍 Surat, Gujarat, India</div>
-        </section>
-
-        <section id="skills" class="section">
-            <h2 class="section-title reveal glow-gold">Systems Online</h2>
-            <div class="skills-container reveal">
-                <svg id="skill-constellation" width="100%" height="100%"></svg>
-                <div class="skill-category">
-                    <h3 class="glow-gold">★ iOS DEVELOPMENT</h3>
-                    <div class="skill-tags"><span class="skill-tag">Swift</span><span class="skill-tag">SwiftUI</span><span class="skill-tag">UIKit</span><span class="skill-tag">Xcode</span><span class="skill-tag">Core Data</span><span class="skill-tag">AVFoundation</span><span class="skill-tag">Push Notifications</span></div>
-                </div>
-                <div class="skill-category">
-                    <h3 class="glow-gold">★ BACKEND</h3>
-                    <div class="skill-tags"><span class="skill-tag">ASP.NET Core</span><span class="skill-tag">C#</span><span class="skill-tag">Java EE</span><span class="skill-tag">RESTful APIs</span><span class="skill-tag">Firebase Functions</span></div>
-                </div>
-                <div class="skill-category">
-                    <h3 class="glow-gold">★ CLOUD & DATA</h3>
-                    <div class="skill-tags"><span class="skill-tag">Firebase</span><span class="skill-tag">MySQL</span><span class="skill-tag">Firestore</span><span class="skill-tag">Firebase Auth</span><span class="skill-tag">Firebase Storage</span></div>
+            <div class="skill-category reveal">
+                <h3 class="glow-gold">★ Backend</h3>
+                <div class="skill-tags">
+                    <span class="skill-tag">ASP.NET Core</span><span class="skill-tag">C#</span><span class="skill-tag">Java EE</span>
+                    <span class="skill-tag">PHP</span><span class="skill-tag">RESTful APIs</span><span class="skill-tag">Firebase Functions</span>
                 </div>
             </div>
-        </section>
-
-        <section id="projects" class="section">
-            <h2 class="section-title reveal glow-cyan">Deployed Missions</h2>
-            <div class="mission-card mission-flagship glass-card reveal">
-                <div class="mission-header">
-                    <div class="mission-badge mission-id">MISSION 01</div>
-                    <div class="mission-badge mission-status">★ FLAGSHIP</div>
+            <div class="skill-category reveal">
+                <h3 class="glow-gold">★ Frontend</h3>
+                <div class="skill-tags">
+                    <span class="skill-tag">HTML5</span><span class="skill-tag">CSS3</span><span class="skill-tag">JavaScript</span>
+                    <span class="skill-tag">Bootstrap</span><span class="skill-tag">Responsive Design</span>
                 </div>
-                <div class="hero-project-grid">
-                    <div>
-                        <h3>My Campus — iOS Social App</h3>
-                        <p>A campus social networking app empowering students to connect, share posts, and stay updated with campus life. Built with Swift/SwiftUI and Firebase.</p>
-                        <ul class="mission-features">
-                            <li><i class="fas fa-check-circle"></i> Photo & Video Sharing</li>
-                            <li><i class="fas fa-check-circle"></i> Native iOS Media Picker</li>
-                            <li><i class="fas fa-check-circle"></i> Real-time Feed & Likes</li>
-                            <li><i class="fas fa-check-circle"></i> User Profiles & Avatars</li>
-                        </ul>
-                        <div class="tech-pills"><span class="tech-pill">SwiftUI</span><span class="tech-pill">Firebase</span><span class="tech-pill">AVFoundation</span></div>
+            </div>
+            <div class="skill-category reveal">
+                <h3 class="glow-gold">★ Cloud & Data</h3>
+                <div class="skill-tags">
+                    <span class="skill-tag">Firebase Firestore</span><span class="skill-tag">Firebase Auth</span>
+                    <span class="skill-tag">Firebase Storage</span><span class="skill-tag">MySQL</span><span class="skill-tag">Cloud Firestore</span>
+                </div>
+            </div>
+            <div class="skill-category reveal">
+                <h3 class="glow-gold">★ Tools & Architecture</h3>
+                <div class="skill-tags">
+                    <span class="skill-tag">Git</span><span class="skill-tag">GitHub</span><span class="skill-tag">Android Studio</span>
+                    <span class="skill-tag">Figma</span><span class="skill-tag">MVC</span><span class="skill-tag">MVVM</span>
+                    <span class="skill-tag">Microservices</span><span class="skill-tag">Agile</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ PROJECTS ══ -->
+    <section id="projects" class="section">
+        <h2 class="section-title reveal glow-cyan">Deployed Missions</h2>
+
+        <!-- FLAGSHIP -->
+        <div class="flagship-card glass-card reveal">
+            <div class="mission-header">
+                <span class="mission-badge badge-id">MISSION 01</span>
+                <span class="mission-badge badge-flag">★ FLAGSHIP</span>
+                <span class="mission-badge badge-live"><span class="live-dot"></span>LIVE</span>
+            </div>
+            <div class="flagship-inner">
+                <div>
+                    <h3>My Campus — iOS Social App</h3>
+                    <p>A campus social networking iOS app empowering students to connect, share posts (photos + videos), and stay updated with campus life. Built with Swift/SwiftUI and Firebase.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Photo &amp; Video post sharing</li>
+                        <li><i class="fas fa-check-circle"></i> Native iOS media picker</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time feed &amp; likes</li>
+                        <li><i class="fas fa-check-circle"></i> User profiles &amp; avatars</li>
+                        <li><i class="fas fa-check-circle"></i> Location tagging on posts</li>
+                        <li><i class="fas fa-check-circle"></i> Live timestamps (Now, 3m ago)</li>
+                        <li><i class="fas fa-check-circle"></i> Bottom tab navigation</li>
+                        <li><i class="fas fa-check-circle"></i> Firebase Auth + Firestore</li>
+                    </ul>
+                    <div class="tech-pills">
+                        <span class="tech-pill">Swift</span>
+                        <span class="tech-pill">SwiftUI</span>
+                        <span class="tech-pill">Firebase</span>
+                        <span class="tech-pill">Firestore</span>
+                        <span class="tech-pill">AVFoundation</span>
+                        <span class="tech-pill">Firebase Auth</span>
+                        <span class="tech-pill">Firebase Storage</span>
                     </div>
-                    <div class="iphone-mockup">
-                        <div class="iphone-screen">
-                            <div class="carousel-slide active"><img src="https://i.imgur.com/U3a0x2F.png" alt="My Campus App Feed"></div>
-                            <div class="carousel-slide"><img src="https://i.imgur.com/zW1zL9I.png" alt="My Campus New Post"></div>
-                            <div class="carousel-slide"><img src="https://i.imgur.com/K3y2D5g.png" alt="My Campus Media Picker"></div>
+                    <a href="https://github.com/hinman2115" target="_blank" class="btn btn-primary" style="margin-top:20px;">
+                        <i class="fab fa-github"></i> View Source
+                    </a>
+                </div>
+                <div>
+                    <div class="iphone-wrap">
+                        <div class="iphone-frame" id="carousel">
+                            <!-- slides: show placeholder screens since images need local paths -->
+                            <div class="carousel-slide active" id="s0">
+                                <div style="width:100%;height:100%;background:linear-gradient(180deg,#080B1A 0%,#03020A 100%);display:flex;flex-direction:column;align-items:center;padding:20px 10px;gap:12px;">
+                                    <div style="font-family:Orbitron;font-size:.6rem;color:var(--starlight-cyan);letter-spacing:.1em;">MY CAMPUS</div>
+                                    <div style="width:90%;background:rgba(0,245,255,.05);border:1px solid rgba(0,245,255,.2);border-radius:12px;padding:10px;">
+                                        <div style="font-size:.55rem;color:var(--starlight-cyan);margin-bottom:6px;">Naman Khatri · Now</div>
+                                        <div style="width:100%;height:80px;background:linear-gradient(135deg,#1a3a2a,#0d2b3a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🐱</div>
+                                        <div style="font-size:.5rem;color:var(--moonlight);margin-top:6px;">Test</div>
+                                        <div style="display:flex;gap:8px;margin-top:4px;font-size:.45rem;color:rgba(232,244,253,.5);">♥ 0 &nbsp; 💬 0</div>
+                                    </div>
+                                    <div style="width:90%;background:rgba(0,245,255,.05);border:1px solid rgba(0,245,255,.1);border-radius:12px;padding:10px;">
+                                        <div style="font-size:.55rem;color:var(--starlight-cyan);">Naman Khatri · 3m</div>
+                                        <div style="width:100%;height:60px;background:linear-gradient(135deg,#1a2a4a,#0d1b3a);border-radius:8px;margin-top:6px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-slide" id="s1">
+                                <div style="width:100%;height:100%;background:#080B1A;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 20px;gap:0;">
+                                    <div style="width:90%;background:rgba(8,11,26,.95);border:1px solid rgba(0,245,255,.2);border-radius:20px;padding:20px;text-align:center;">
+                                        <div style="font-family:Orbitron;font-size:.7rem;color:var(--moonlight);margin-bottom:14px;">NEW POST</div>
+                                        <div style="width:100%;background:rgba(0,245,255,.06);border:1px solid rgba(0,245,255,.2);border-radius:10px;padding:12px;text-align:left;">
+                                            <div style="font-size:.55rem;color:var(--starlight-cyan);margin-bottom:8px;">★ Upload Photo</div>
+                                            <div style="font-size:.45rem;color:rgba(232,244,253,.4);">PNG, JPG</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-slide" id="s2">
+                                <div style="width:100%;height:100%;background:#080B1A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;">
+                                    <div style="font-family:Orbitron;font-size:.65rem;color:var(--moonlight);">CHOOSE MEDIA</div>
+                                    <div style="width:90%;background:rgba(0,245,255,.08);border:1px solid rgba(0,245,255,.3);border-radius:12px;padding:14px;text-align:center;font-size:.65rem;color:var(--moonlight);">📷 Photo</div>
+                                    <div style="width:90%;background:rgba(0,245,255,.08);border:1px solid rgba(0,245,255,.3);border-radius:12px;padding:14px;text-align:center;font-size:.65rem;color:var(--moonlight);">🎬 Video</div>
+                                </div>
+                            </div>
+                            <div class="carousel-slide" id="s3">
+                                <div style="width:100%;height:100%;background:#080B1A;display:flex;flex-direction:column;padding:16px;gap:10px;">
+                                    <div style="display:flex;gap:8px;">
+                                        <div style="background:rgba(0,245,255,.15);border-radius:20px;padding:4px 10px;font-size:.55rem;color:var(--starlight-cyan);">Videos</div>
+                                        <div style="background:transparent;border:1px solid rgba(232,244,253,.2);border-radius:20px;padding:4px 10px;font-size:.55rem;color:rgba(232,244,253,.5);">Collections</div>
+                                    </div>
+                                    <div style="background:rgba(0,245,255,.04);border:1px solid rgba(0,245,255,.15);border-radius:10px;padding:8px;font-size:.5rem;color:rgba(232,244,253,.7);">🔒 Private Access — My Campus can only access items you select.</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;flex:1;">
+                                        <div style="background:rgba(0,245,255,.05);border-radius:6px;aspect-ratio:1;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px;font-size:.45rem;color:rgba(232,244,253,.6);">0:03</div>
+                                        <div style="background:rgba(123,47,190,.1);border-radius:6px;aspect-ratio:1;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px;font-size:.45rem;color:rgba(232,244,253,.6);">0:08</div>
+                                        <div style="background:rgba(0,245,255,.05);border-radius:6px;aspect-ratio:1;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px;font-size:.45rem;color:rgba(232,244,253,.6);">0:34</div>
+                                        <div style="background:rgba(198,42,136,.1);border-radius:6px;aspect-ratio:1;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px;font-size:.45rem;color:rgba(232,244,253,.6);">0:30</div>
+                                        <div style="background:rgba(0,245,255,.05);border-radius:6px;aspect-ratio:1;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px;font-size:.45rem;color:rgba(232,244,253,.6);">0:28</div>
+                                        <div style="background:rgba(123,47,190,.1);border-radius:6px;aspect-ratio:1;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px;font-size:.45rem;color:rgba(232,244,253,.6);">0:14</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <div class="carousel-dots" id="carousel-dots">
+                        <div class="carousel-dot active" data-idx="0"></div>
+                        <div class="carousel-dot" data-idx="1"></div>
+                        <div class="carousel-dot" data-idx="2"></div>
+                        <div class="carousel-dot" data-idx="3"></div>
+                    </div>
                 </div>
             </div>
-            <div class="other-missions-grid">
-                <div class="mission-card other-mission-card glass-card reveal"><h3 class="glow-gold">MISSION 02: Quick Commerce</h3><p>Scalable area-based commerce with real-time inventory and a RESTful API architecture.</p><div class="tech-pills"><span class="tech-pill">ASP.NET Core</span><span class="tech-pill">C#</span></div></div>
-                <div class="mission-card other-mission-card glass-card reveal"><h3 class="glow-gold">MISSION 03: Enterprise E-commerce</h3><p>Full-featured e-commerce platform with MVC architecture and secure payment integration.</p><div class="tech-pills"><span class="tech-pill">Java EE</span><span class="tech-pill">MySQL</span></div></div>
-                <div class="mission-card other-mission-card glass-card reveal"><h3 class="glow-gold">MISSION 04: Flutter Chat App</h3><p>Cross-platform real-time messaging app with multimedia sharing and push notifications.</p><div class="tech-pills"><span class="tech-pill">Flutter</span><span class="tech-pill">Firebase</span></div></div>
-                 <div class="mission-card other-mission-card glass-card reveal"><h3 class="glow-gold">MISSION 05: Book Marketplace</h3><p>Responsive online book marketplace with advanced search, user reviews, and order tracking.</p><div class="tech-pills"><span class="tech-pill">PHP</span><span class="tech-pill">Bootstrap</span></div></div>
-            </div>
-        </section>
+        </div>
 
-        <section id="timeline" class="section">
-            <h2 class="section-title reveal glow-gold">Flight Log</h2>
-            <div class="timeline-container">
-                <div class="timeline-item reveal"><div class="timeline-content glass-card"><h3>2024-Present</h3><p>iOS Development & My Campus App Launch</p></div></div>
-                <div class="timeline-item reveal"><div class="timeline-content glass-card"><h3>2023</h3><p>Full-Stack Development (ASP.NET / Quick Commerce)</p></div></div>
-                <div class="timeline-item reveal"><div class="timeline-content glass-card"><h3>2022</h3><p>Flutter & Java EE Backend Development</p></div></div>
-            </div>
-        </section>
-
-        <section id="contact" class="section">
-            <h2 class="section-title reveal glow-cyan">Open Channel</h2>
-            <div class="contact-container glass-card reveal">
-                <div class="contact-readouts">
-                    <div><span>📡 SIGNAL:</span> namanramphale2115@gmail.com</div>
-                    <div><span>🌍 BASE:</span> Surat, Gujarat, India</div>
+        <!-- OTHER MISSIONS -->
+        <div class="other-grid">
+            <div class="other-card glass-card reveal">
+                <div class="mission-header">
+                    <span class="mission-badge badge-id">MISSION 02</span>
+                    <span class="mission-badge badge-live"><span class="live-dot"></span>ACTIVE</span>
                 </div>
-                <form class="contact-form">
-                    <div class="form-group"><input type="text" id="name" class="form-input" required><label for="name" class="form-label">Name</label></div>
-                    <div class="form-group"><input type="email" id="email" class="form-input" required><label for="email" class="form-label">Email</label></div>
-                    <div class="form-group"><input type="text" id="message" class="form-input" required><label for="message" class="form-label">Message</label></div>
-                    <button type="submit" class="btn">Transmit Message</button>
-                </form>
+                <h3 class="glow-gold" style="margin-top:12px;">Quick Commerce Platform</h3>
+                <p>Scalable area-based quick commerce with real-time inventory management, RESTful API architecture, and responsive UI.</p>
+                <div class="tech-pills"><span class="tech-pill">ASP.NET Core</span><span class="tech-pill">C#</span><span class="tech-pill">JavaScript</span><span class="tech-pill">MySQL</span></div>
             </div>
-        </section>
-    </main>
+            <div class="other-card glass-card reveal">
+                <div class="mission-header">
+                    <span class="mission-badge badge-id">MISSION 03</span>
+                    <span style="font-family:Orbitron;font-size:.7rem;color:rgba(232,244,253,.5);">Jan–Dec 2022</span>
+                </div>
+                <h3 class="glow-gold" style="margin-top:12px;">Enterprise E-commerce</h3>
+                <p>Full-featured e-commerce with MVC architecture, secure payment integration, and high-traffic MySQL optimization.</p>
+                <div class="tech-pills"><span class="tech-pill">Java EE</span><span class="tech-pill">MySQL</span><span class="tech-pill">JSP</span><span class="tech-pill">Apache Tomcat</span></div>
+            </div>
+            <div class="other-card glass-card reveal">
+                <div class="mission-header">
+                    <span class="mission-badge badge-id">MISSION 04</span>
+                    <span style="font-family:Orbitron;font-size:.7rem;color:rgba(232,244,253,.5);">Mar–Nov 2022</span>
+                </div>
+                <h3 class="glow-gold" style="margin-top:12px;">Flutter Chat App</h3>
+                <p>Cross-platform real-time messaging with multimedia sharing, push notifications, and offline message caching.</p>
+                <div class="tech-pills"><span class="tech-pill">Flutter</span><span class="tech-pill">Dart</span><span class="tech-pill">Firebase</span><span class="tech-pill">Firestore</span></div>
+            </div>
+            <div class="other-card glass-card reveal">
+                <div class="mission-header">
+                    <span class="mission-badge badge-id">MISSION 05</span>
+                    <span style="font-family:Orbitron;font-size:.7rem;color:rgba(232,244,253,.5);">Jun 2021–Feb 2022</span>
+                </div>
+                <h3 class="glow-gold" style="margin-top:12px;">Book Marketplace</h3>
+                <p>Responsive online book marketplace with advanced search, user reviews, order tracking, and SEO optimization.</p>
+                <div class="tech-pills"><span class="tech-pill">PHP</span><span class="tech-pill">MySQL</span><span class="tech-pill">HTML5</span><span class="tech-pill">Bootstrap</span></div>
+            </div>
+        </div>
+    </section>
 
-    <footer><p>NAMAN RAMPHALE © 2025. Designed & Built somewhere in the cosmos 🌌</p></footer>
-    <a href="#hero" class="back-to-top">🚀</a>
+    <!-- ══ TIMELINE ══ -->
+    <section id="timeline" class="section">
+        <h2 class="section-title reveal glow-gold">Flight Log</h2>
+        <div class="timeline-wrap">
+            <div class="timeline-line"></div>
+            <div class="timeline-item reveal">
+                <div class="timeline-node"></div>
+                <div class="timeline-card glass-card">
+                    <h3>2024 – Present</h3>
+                    <p>iOS Development &amp; My Campus App Launch — Swift, SwiftUI, Firebase</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-node"></div>
+                <div class="timeline-card glass-card">
+                    <h3>2023</h3>
+                    <p>Full-Stack Development — ASP.NET Core, Quick Commerce Platform</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-node"></div>
+                <div class="timeline-card glass-card">
+                    <h3>Mar – Nov 2022</h3>
+                    <p>Flutter Cross-Platform Development — Chat App, Dart, Firebase</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-node"></div>
+                <div class="timeline-card glass-card">
+                    <h3>Jan – Dec 2022</h3>
+                    <p>Enterprise Java EE E-commerce — MVC, MySQL, Apache Tomcat</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-node"></div>
+                <div class="timeline-card glass-card">
+                    <h3>Jun 2021 – Feb 2022</h3>
+                    <p>PHP Web Development — Book Marketplace, Bootstrap, SEO</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- Canvas Space Animation ---
-        const canvas = document.getElementById('space-canvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [], shootingStars = [], nebulae = [];
-        let scrollY = window.scrollY;
+    <!-- ══ CONTACT ══ -->
+    <section id="contact" class="section">
+        <h2 class="section-title reveal glow-cyan">Open Channel</h2>
+        <div class="contact-wrap glass-card reveal">
+            <div class="contact-readouts">
+                <div><span class="label">📡 SIGNAL: </span>namanramphale2115@gmail.com</div>
+                <div><span class="label">📱 COMM: </span>+91-9106479647</div>
+                <div><span class="label">🌍 BASE: </span>Surat, Gujarat, India</div>
+            </div>
+            <form id="contact-form">
+                <div class="form-group">
+                    <input type="text" class="form-input" id="fname" placeholder=" " required>
+                    <label class="form-label" for="fname">Name</label>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-input" id="femail" placeholder=" " required>
+                    <label class="form-label" for="femail">Email</label>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-input" id="fmsg" placeholder=" " required></textarea>
+                    <label class="form-label" for="fmsg">Message</label>
+                </div>
+                <button type="submit" class="btn btn-transmit">⚡ TRANSMIT MESSAGE</button>
+            </form>
+            <div class="social-row">
+                <a class="social-btn" href="https://github.com/hinman2115" target="_blank"><i class="fab fa-github"></i></a>
+                <a class="social-btn" href="mailto:namanramphale2115@gmail.com"><i class="fas fa-envelope"></i></a>
+                <a class="social-btn" href="tel:+919106479647"><i class="fas fa-phone"></i></a>
+            </div>
+        </div>
+    </section>
 
-        function setupCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = [];
-            nebulae = [];
-            // Layer 1: Distant Stars
-            for(let i=0; i<300; i++) stars.push(new Star(0.05, Math.random()*0.7+0.3, Math.random()*1+0.3, `rgba(255,255,255,${Math.random()*0.4+0.3})`));
-            // Layer 2: Mid Stars
-            for(let i=0; i<150; i++) stars.push(new Star(0.15, Math.random()*0.8+0.5, Math.random()*1+1, `rgba(200,245,255,${Math.random()*0.5+0.3})`));
-            // Layer 3: Near Stars
-            for(let i=0; i<50; i++) stars.push(new Star(0.3, 1, Math.random()*1.5+1.5, Math.random() > 0.5 ? 'rgba(0,245,255,0.9)' : '#FFD700'));
-            
-            nebulae.push(new Nebula(canvas.width*0.1, canvas.height*0.2, 400, 'rgba(123,47,190,0.06)', 0.05, 0.03));
-            nebulae.push(new Nebula(canvas.width*0.8, canvas.height*0.5, 350, 'rgba(198,42,136,0.04)', -0.04, 0.06));
-            nebulae.push(new Nebula(canvas.width*0.2, canvas.height*0.8, 500, 'rgba(0,245,255,0.03)', 0.02, -0.05));
-        }
+</main>
 
-        class Star {
-            constructor(parallax, opacity, radius, color) {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.y_initial = this.y;
-                this.parallax = parallax;
-                this.opacity_base = opacity;
-                this.radius = radius;
-                this.color = color;
-                this.twinkle_speed = Math.random() * 0.05;
-            }
-            draw(time) {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.opacity_base + Math.sin(time * this.twinkle_speed) * 0.3;
-                ctx.fill();
-            }
-            update() { this.y = this.y_initial + scrollY * this.parallax; }
-        }
-        
-        class Nebula {
-            constructor(x, y, radius, color, speedX, speedY) {
-                this.x = x; this.y = y; this.radius = radius; this.color = color; this.speedX = speedX; this.speedY = speedY;
-            }
-            draw() {
-                let gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-                gradient.addColorStop(0, this.color.replace(')', ',0.2)'));
-                gradient.addColorStop(1, this.color.replace(')', ',0)'));
-                ctx.fillStyle = gradient;
-                ctx.fillRect(this.x-this.radius, this.y-this.radius, this.radius*2, this.radius*2);
-            }
-            update(time) { this.x += Math.sin(time * 0.0001) * this.speedX; this.y += Math.cos(time * 0.0001) * this.speedY; }
-        }
+<footer>
+    <p>NAMAN RAMPHALE © 2025 &nbsp;·&nbsp; Designed &amp; Built somewhere in the cosmos 🌌</p>
+</footer>
+<a class="back-top" href="#hero">🚀</a>
 
-        class ShootingStar {
-            constructor() {
-                this.x = Math.random()*canvas.width*1.5;
-                this.y = 0;
-                this.len = Math.random()*80+100;
-                this.speed = Math.random()*5+5;
-                this.active = true;
-            }
-            draw() {
-                ctx.beginPath();
-                const grad = ctx.createLinearGradient(this.x, this.y, this.x - this.len, this.y + this.len);
-                grad.addColorStop(0, 'white');
-                grad.addColorStop(1, 'rgba(255,255,255,0)');
-                ctx.strokeStyle = grad;
-                ctx.lineWidth = 2;
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(this.x - this.len, this.y + this.len);
-                ctx.stroke();
-            }
-            update() { this.x -= this.speed; this.y += this.speed; if (this.y >= canvas.height + this.len) this.active = false; }
-        }
-        
-        let lastShootTime = 0;
-        function animateSpace(time) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.globalAlpha = 1;
-            nebulae.forEach(n => { n.update(time); n.draw(); });
-            stars.forEach(s => { s.update(); s.draw(time); });
-            ctx.globalAlpha = 1;
-            
-            if(time - lastShootTime > Math.random()*4000+4000) {
-                shootingStars.push(new ShootingStar());
-                lastShootTime = time;
-            }
-            shootingStars = shootingStars.filter(ss => ss.active);
-            shootingStars.forEach(ss => { ss.update(); ss.draw(); });
-            
-            requestAnimationFrame(animateSpace);
-        }
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+(function () {
 
-        setupCanvas();
-        animateSpace(0);
-        window.addEventListener('resize', setupCanvas);
-        window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+/* ── CURSOR ── */
+const cursor = document.getElementById('cursor');
+let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+(function moveCursor() {
+    cursorX += (mouseX - cursorX) * 0.12;
+    cursorY += (mouseY - cursorY) * 0.12;
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top  = cursorY + 'px';
+    requestAnimationFrame(moveCursor);
+})();
+document.querySelectorAll('a,button,.skill-tag,.tech-pill,.social-btn').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+});
 
-        // --- Intersection Observer ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, i) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    // Stagger skill tags
-                    if(entry.target.id === 'skills') {
-                        const tags = document.querySelectorAll('.skill-tag');
-                        tags.forEach((tag, j) => {
-                            tag.style.animationDelay = `${j * 80}ms`;
-                        });
-                        document.getElementById('skill-constellation').style.opacity = '0.15';
-                    }
-                    // Animate counters
-                    const counter = entry.target.querySelector('.stat-number[data-count]');
-                    if (counter && !counter.classList.contains('counted')) {
-                         // ... counter logic ...
-                    }
-                }
-            });
-        }, { threshold: 0.2 });
+/* ── NAVBAR ── */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+});
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        observer.observe(document.querySelector('.section-title'));
+/* ── CANVAS STARFIELD ── */
+const canvas = document.getElementById('space-canvas');
+const ctx    = canvas.getContext('2d');
+let W, H, stars = [], nebulae = [], shooters = [];
+let scrollY = 0;
 
-        // --- Typewriter ---
-        const typewriterText = document.getElementById('typewriter-text');
-        const roles = ["Full-Stack Developer", "iOS Developer", "Mobile App Builder", "Firebase Explorer"];
-        let roleIndex = 0, charIndex = 0, isDeleting = false;
-        function type() {
-            const currentRole = roles[roleIndex];
-            const typeSpeed = isDeleting ? 60 : 120;
-            charIndex += isDeleting ? -1 : 1;
-            typewriterText.textContent = currentRole.substring(0, charIndex);
-            if (!isDeleting && charIndex === currentRole.length) {
-                setTimeout(() => isDeleting = true, 2000);
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false; roleIndex = (roleIndex + 1) % roles.length;
-            }
-            setTimeout(type, typeSpeed);
-        }
-        setTimeout(type, 1000);
+function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    buildStars();
+    buildNebulae();
+}
 
-        // --- Carousel ---
-        const slides = document.querySelectorAll('.carousel-slide');
-        let currentSlide = 0;
-        if(slides.length > 0) {
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 3500);
-        }
+function buildStars() {
+    stars = [];
+    // Layer 1 — distant (300)
+    for (let i = 0; i < 300; i++)
+        stars.push({ x: Math.random()*W, y0: Math.random()*H, r: Math.random()*0.8+0.2,
+            alpha: Math.random()*0.5+0.3, speed: Math.random()*0.04+0.01,
+            offset: Math.random()*Math.PI*2, parallax: 0.05 });
+    // Layer 2 — mid (150)
+    for (let i = 0; i < 150; i++)
+        stars.push({ x: Math.random()*W, y0: Math.random()*H, r: Math.random()*1+0.8,
+            alpha: Math.random()*0.5+0.4, speed: Math.random()*0.07+0.02,
+            offset: Math.random()*Math.PI*2, parallax: 0.15,
+            cyan: Math.random() > 0.7 });
+    // Layer 3 — near (50)
+    for (let i = 0; i < 50; i++) {
+        const type = Math.random();
+        stars.push({ x: Math.random()*W, y0: Math.random()*H, r: Math.random()*1.5+1.5,
+            alpha: 1, speed: Math.random()*0.1+0.05,
+            offset: Math.random()*Math.PI*2, parallax: 0.3,
+            gold: type > 0.6, cyan: type > 0.3 && type <= 0.6 });
+    }
+}
+
+function buildNebulae() {
+    nebulae = [
+        { x0: W*.1,  y0: H*.2, r: 400, color: 'rgba(123,47,190,', alpha: .08, dx: .04, dy: .03, t:0 },
+        { x0: W*.85, y0: H*.5, r: 350, color: 'rgba(198,42,136,',  alpha: .05, dx:-.04,dy: .06, t:1 },
+        { x0: W*.2,  y0: H*.8, r: 500, color: 'rgba(0,245,255,',   alpha: .04, dx: .02, dy:-.05,t:2 },
+        { x0: W*.9,  y0: H*.15,r: 300, color: 'rgba(30,60,200,',   alpha: .06, dx:-.03, dy: .04,t:3 },
+    ];
+}
+
+class Shooter {
+    constructor() {
+        this.x  = Math.random() * W * 1.5;
+        this.y  = 0;
+        this.len = Math.random() * 100 + 80;
+        this.spd = Math.random() * 6 + 5;
+        this.life = 1;
+    }
+    update() {
+        this.x   -= this.spd;
+        this.y   += this.spd;
+        this.life -= 0.018;
+    }
+    draw() {
+        ctx.save();
+        const grd = ctx.createLinearGradient(this.x, this.y, this.x - this.len, this.y + this.len);
+        grd.addColorStop(0, `rgba(255,255,255,${this.life})`);
+        grd.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.strokeStyle = grd;
+        ctx.lineWidth   = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x - this.len, this.y + this.len);
+        ctx.stroke();
+        ctx.restore();
+    }
+    dead() { return this.life <= 0 || this.y > H + this.len; }
+}
+
+let lastShoot = 0;
+function animate(t) {
+    ctx.clearRect(0, 0, W, H);
+
+    // nebulae
+    nebulae.forEach(n => {
+        const nx = n.x0 + Math.sin(t * 0.00005 + n.t) * 25;
+        const ny = n.y0 + Math.cos(t * 0.00004 + n.t) * 20;
+        const grd = ctx.createRadialGradient(nx, ny, 0, nx, ny, n.r);
+        grd.addColorStop(0, n.color + n.alpha + ')');
+        grd.addColorStop(1, n.color + '0)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(nx - n.r, ny - n.r, n.r*2, n.r*2);
     });
-    </script>
+
+    // stars
+    stars.forEach(s => {
+        const tw = Math.sin(t * s.speed + s.offset);
+        const a  = Math.max(0, Math.min(1, s.alpha + tw * 0.3));
+        const y  = (s.y0 + scrollY * s.parallax) % H;
+        ctx.beginPath();
+        ctx.arc(s.x, y, s.r + (s.parallax > 0.2 ? Math.sin(t*s.speed*0.5)*0.5 : 0), 0, Math.PI*2);
+        ctx.fillStyle = s.gold ? `rgba(255,215,0,${a})`
+                     : s.cyan ? `rgba(0,245,255,${a})`
+                     : `rgba(255,255,255,${a})`;
+        ctx.fill();
+    });
+
+    // shooting stars
+    if (t - lastShoot > Math.random() * 5000 + 4000) {
+        shooters.push(new Shooter());
+        if (Math.random() > 0.75) shooters.push(new Shooter());
+        lastShoot = t;
+    }
+    shooters = shooters.filter(s => !s.dead());
+    shooters.forEach(s => { s.update(); s.draw(); });
+
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', resize);
+window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+resize();
+requestAnimationFrame(animate);
+
+/* ── TYPEWRITER ── */
+const twEl   = document.getElementById('tw-text');
+const roles  = ['Full-Stack Developer', 'iOS Developer', 'Mobile App Builder', 'Firebase Explorer'];
+let ri = 0, ci = 0, deleting = false;
+function type() {
+    const role = roles[ri];
+    ci += deleting ? -1 : 1;
+    twEl.textContent = role.slice(0, ci);
+    if (!deleting && ci === role.length) { setTimeout(() => { deleting = true; }, 2200); }
+    else if (deleting && ci === 0)       { deleting = false; ri = (ri + 1) % roles.length; }
+    setTimeout(type, deleting ? 55 : 110);
+}
+setTimeout(type, 800);
+
+/* ── INTERSECTION OBSERVER — reveal + section titles + skills ── */
+const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        el.classList.add('visible');
+
+        // Skill power-on
+        if (el.classList.contains('skill-category')) {
+            el.querySelectorAll('.skill-tag').forEach((tag, j) => {
+                setTimeout(() => tag.classList.add('lit'), j * 75);
+            });
+        }
+
+        // Stat counters
+        el.querySelectorAll('.stat-number[data-target]').forEach(num => {
+            if (num.dataset.counted) return;
+            num.dataset.counted = true;
+            const target = +num.dataset.target;
+            const dur    = 1400;
+            const start  = performance.now();
+            function step(now) {
+                const p = Math.min((now - start) / dur, 1);
+                const ease = 1 - Math.pow(1 - p, 3);
+                num.textContent = Math.floor(ease * target) + (p < 1 ? '' : '+');
+                if (p < 1) requestAnimationFrame(step);
+                else num.textContent = target + (target > 1 ? '+' : '');
+            }
+            requestAnimationFrame(step);
+        });
+
+        io.unobserve(el);
+    });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal, .section-title').forEach(el => io.observe(el));
+
+/* ── CAROUSEL ── */
+const slides     = document.querySelectorAll('#carousel .carousel-slide');
+const dots       = document.querySelectorAll('#carousel-dots .carousel-dot');
+let   curSlide   = 0;
+
+function goSlide(idx) {
+    slides[curSlide].classList.remove('active');
+    dots[curSlide].classList.remove('active');
+    curSlide = idx % slides.length;
+    slides[curSlide].classList.add('active');
+    dots[curSlide].classList.add('active');
+}
+setInterval(() => goSlide(curSlide + 1), 3500);
+dots.forEach(d => d.addEventListener('click', () => goSlide(+d.dataset.idx)));
+
+/* ── CONTACT FORM ── */
+document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button');
+    btn.textContent = '✅ MESSAGE TRANSMITTED';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = '⚡ TRANSMIT MESSAGE'; btn.disabled = false; this.reset(); }, 3000);
+});
+
+/* ── HAMBURGER ── */
+const ham = document.getElementById('hamburger');
+const navLinks = document.querySelector('.nav-links');
+ham.addEventListener('click', () => navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex');
+
+})();
+</script>
 </body>
 </html>
