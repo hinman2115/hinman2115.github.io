@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,7 @@
     <title>Naman Ramphale - Full-Stack & iOS Developer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -18,428 +17,349 @@
             --text-secondary: #A0A0A0;
             --card-bg: rgba(22, 22, 28, 0.5);
             --border-color: rgba(255, 255, 255, 0.1);
+            --glow-color: rgba(0, 201, 167, 0.7);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
             background-color: var(--bg-dark);
             color: var(--text-light);
             font-family: 'DM Sans', sans-serif;
             overflow-x: hidden;
-            scroll-behavior: smooth;
+            cursor: none;
         }
+        
+        /* Custom Cursor */
         .cursor-glow {
             position: fixed;
             width: 20px;
             height: 20px;
             border-radius: 50%;
             background-color: var(--primary-teal);
-            box-shadow: 0 0 20px var(--primary-teal), 0 0 30px var(--primary-teal);
+            box-shadow: 0 0 20px var(--primary-teal), 0 0 30px var(--primary-teal), 0 0 40px var(--glow-color);
             pointer-events: none;
             transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out, width 0.3s ease, height 0.3s ease;
+            transition: transform 0.1s ease-out;
             z-index: 9999;
-            opacity: 0.7;
+            opacity: 0;
         }
-        canvas#particle-canvas {
+
+        #particle-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            opacity: 0.2;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -2;
+            opacity: 0.1;
         }
-        .section {
-            padding: 100px 5%;
-            overflow: hidden;
-            position: relative;
-        }
-        .section-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 60px;
-            color: var(--text-light);
-            position: relative;
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background: var(--accent-orange);
-        }
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-        }
-        .hero-content .name {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 5rem;
-            color: var(--text-light);
-            margin-bottom: 1rem;
-            animation: glitch 1s linear infinite;
-        }
-        @keyframes glitch{
-          2%,64%{ transform: translate(2px,0) skew(0deg); }
-          4%,60%{ transform: translate(-2px,0) skew(0deg); }
-          62%{ transform: translate(0,0) skew(5deg); }
-        }
-        .hero-content .name:before, .hero-content .name:after {
-            content: attr(data-text);
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            background: var(--bg-dark);
-            overflow: hidden;
-        }
-        .hero-content .name:before {
-            left: 2px;
-            text-shadow: -2px 0 var(--primary-teal);
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        .hero-content .name:after {
-            left: -2px;
-            text-shadow: -2px 0 var(--accent-orange), 2px 2px var(--primary-teal);
-            animation: glitch-anim-2 1s infinite linear alternate-reverse;
-        }
-        @keyframes glitch-anim{
-          0% { clip: rect(42px, 9999px, 44px, 0); }
-          /* ... (add more steps for a complex glitch) ... */
-          100% { clip: rect(90px, 9999px, 98px, 0); }
-        }
-        @keyframes glitch-anim-2{
-          0% { clip: rect(80px, 9999px, 86px, 0); }
-           /* ... (add more steps for a complex glitch) ... */
-          100% { clip: rect(30px, 9999px, 36px, 0); }
-        }
-        .typewriter {
+
+        /* Reusable Components & Animations */
+        .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .btn {
+            padding: 15px 30px; text-decoration: none; font-weight: 700; border-radius: 5px;
+            transition: all 0.3s ease; margin: 0 10px; position: relative; overflow: hidden; z-index: 1;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 1.5rem;
-            color: var(--text-secondary);
         }
-        .typewriter .cursor {
-            display: inline-block;
-            background-color: var(--primary-teal);
-            width: 10px;
-            margin-left: 5px;
-            animation: blink 1s infinite;
-        }
+        .btn-primary { background-color: var(--primary-teal); color: var(--bg-dark); }
+        .btn-secondary { border: 1px solid var(--primary-teal); color: var(--primary-teal); }
+        .btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent); transition: left 0.5s; }
+        .btn:hover::before { left: 100%; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); }
+
+        /* Navigation */
+        .main-nav { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 5%; z-index: 100; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
+        .main-nav.scrolled { background-color: rgba(10, 10, 15, 0.7); backdrop-filter: blur(10px); padding: 15px 5%; }
+        .nav-logo { font-family: 'Clash Display', sans-serif; font-size: 1.5rem; color: var(--primary-teal); }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: var(--text-light); text-decoration: none; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 50%; transform: translateX(-50%); background-color: var(--accent-orange); transition: width 0.3s; }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+        /* Hero */
+        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; }
+        .hero-content h1 { font-family: 'Clash Display', sans-serif; font-size: clamp(3rem, 8vw, 6rem); margin-bottom: 1rem; position: relative; display: inline-block; }
+        .typewriter-container { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: var(--text-secondary); min-height: 2.2rem; }
+        .typewriter-container .cursor { display: inline-block; background-color: var(--primary-teal); width: 10px; margin-left: 5px; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
         .hero-buttons { margin-top: 40px; }
-        .btn {
-            padding: 15px 30px;
-            text-decoration: none;
-            font-weight: 500;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-            margin: 0 10px;
-        }
-        .btn-primary {
-            background-color: var(--primary-teal);
-            color: var(--bg-dark);
-        }
-        .btn-secondary {
-            border: 1px solid var(--primary-teal);
-            color: var(--primary-teal);
-        }
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            align-items: center;
-        }
-        .about-stats .stat {
-            font-size: 2.5rem;
-            color: var(--accent-orange);
-            font-weight: bold;
-        }
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        .skill-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 30px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        .skill-card h3 { color: var(--primary-teal); }
-        .skill-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
-        .skill-tag { background: #111; padding: 5px 10px; border-radius: 5px; font-family: 'JetBrains Mono'; }
-        #projects .project-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            margin-bottom: 30px;
-            padding: 30px;
-            border: 1px solid var(--border-color);
-        }
-        #projects .project-card.hero-project {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: center;
-        }
-        .iphone-mockup {
-            width: 100%;
-            height: 500px;
-            background: #000;
-            border-radius: 40px;
-            border: 10px solid #333;
-            padding: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-        .iphone-screen {
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            border-radius: 25px;
-            overflow: hidden;
-        }
-        .carousel-container { position: relative; width: 100%; height: 100%; }
-        .carousel-slide { display: none; width: 100%; height: 100%; }
+        .scroll-indicator { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 2px; height: 40px; background: var(--border-color); }
+        .scroll-indicator::before { content: ''; position: absolute; top: 0; left: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-teal); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(30px); } }
+
+        /* Sections */
+        .section { padding: 120px 8%; position: relative; }
+        .section-title { font-family: 'Clash Display', sans-serif; font-size: clamp(2.5rem, 5vw, 3.5rem); text-align: center; margin-bottom: 80px; position: relative; }
+        .section-title::after { content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: var(--accent-orange); border-radius: 2px; }
+
+        /* About Section */
+        #about .about-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; align-items: center; }
+        .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .stat-item .stat-number { font-size: 3rem; font-family: 'Clash Display'; color: var(--accent-orange); }
+        .stat-item .stat-label { color: var(--text-secondary); }
+        .about-bio p { margin-bottom: 1.5rem; line-height: 1.7; }
+
+        /* Skills Section */
+        #skills .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .skill-category-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 10px; backdrop-filter: blur(10px); transition: transform 0.3s, box-shadow 0.3s; }
+        .skill-category-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); border-color: var(--primary-teal); }
+        .skill-category-card h3 { color: var(--primary-teal); margin-bottom: 20px; }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .skill-tag { background: #111; padding: 8px 12px; border-radius: 5px; font-family: 'JetBrains Mono'; font-size: 0.9rem; }
+
+        /* Projects Section */
+        .project-card { background: var(--card-bg); border: 1px solid var(--border-color); backdrop-filter: blur(10px); border-radius: 15px; margin-bottom: 40px; padding: 40px; transition: all 0.3s ease; }
+        .project-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .hero-project { display: grid; grid-template-columns: 1fr 350px; gap: 40px; align-items: center; }
+        .project-title { font-family: 'Clash Display'; font-size: 2rem; margin-bottom: 15px; }
+        .project-description { line-height: 1.7; margin-bottom: 20px; color: var(--text-secondary); }
+        .project-features { list-style: none; margin: 20px 0; }
+        .project-features li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .project-features i { color: var(--primary-teal); }
+        .project-tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        .tech-tag { background: var(--accent-orange); color: var(--bg-dark); font-family: 'JetBrains Mono'; font-weight: 700; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; }
+        .iphone-mockup { width: 100%; aspect-ratio: 9 / 19.5; background: #111; border-radius: 40px; border: 10px solid #333; padding: 10px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .iphone-screen { width: 100%; height: 100%; border-radius: 30px; overflow: hidden; background: #000; position: relative; }
+        .carousel-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease-in-out; }
+        .carousel-slide.active { opacity: 1; }
         .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
-        .contact-form {
-            max-width: 700px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 15px;
-            background: #111;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            color: var(--text-light);
-        }
-        footer {
-            text-align: center;
-            padding: 30px;
-            border-top: 1px solid var(--border-color);
+        .other-projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; }
+        .status-badge.ongoing { background-color: var(--primary-teal); color: var(--bg-dark); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 201, 167, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 201, 167, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 201, 167, 0); } }
+
+        /* Contact */
+        .contact-container { max-width: 800px; margin: auto; text-align: center; }
+        .contact-form { display: flex; flex-direction: column; gap: 20px; margin-top: 40px; }
+        .form-input { width: 100%; padding: 15px; background: #111; border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-light); font-family: 'DM Sans', sans-serif; font-size: 1rem; transition: border-color 0.3s; }
+        .form-input:focus { border-color: var(--primary-teal); outline: none; box-shadow: 0 0 15px var(--glow-color); }
+        .contact-socials { display: flex; justify-content: center; gap: 30px; margin-top: 40px; }
+        .contact-socials a { color: var(--text-secondary); font-size: 1.5rem; transition: color 0.3s, transform 0.3s; }
+        .contact-socials a:hover { color: var(--primary-teal); transform: translateY(-5px); }
+
+        /* Footer */
+        footer { text-align: center; padding: 40px 5%; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; } /* Simplification for this version */
+            #about .about-grid, .hero-project { grid-template-columns: 1fr; }
+            .iphone-mockup { max-width: 300px; margin: 40px auto 0; }
         }
     </style>
 </head>
 <body>
+
     <div class="cursor-glow"></div>
     <canvas id="particle-canvas"></canvas>
 
-    <header>
-        <!-- Navigation can be added here -->
+    <header class="main-nav">
+        <div class="nav-logo">NR</div>
+        <ul class="nav-links">
+            <li><a href="#hero" class="active">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
     </header>
 
     <main>
         <section id="hero" class="hero">
-            <div class="hero-content">
-                <h1 class="name" data-text="Naman Ramphale">Naman Ramphale</h1>
-                <p class="typewriter">
-                    <span id="typewriter-text"></span>
-                    <span class="cursor"></span>
-                </p>
+            <div class="hero-content reveal">
+                <h1>Naman Ramphale</h1>
+                <div class="typewriter-container">
+                    <span id="typewriter-text"></span><span class="cursor"></span>
+                </div>
                 <div class="hero-buttons">
                     <a href="#projects" class="btn btn-primary">View Projects</a>
                     <a href="#" class="btn btn-secondary">Download Resume</a>
                 </div>
             </div>
+            <div class="scroll-indicator"></div>
         </section>
 
         <section id="about" class="section">
-            <h2 class="section-title">About Me</h2>
+            <h2 class="section-title reveal">About Me</h2>
             <div class="about-grid">
-                <div class="about-stats">
-                    <div class="stat">3+ <span>Years Experience</span></div>
-                    <div class="stat">10+ <span>Projects Built</span></div>
-                    <div class="stat">5+ <span>Technologies Mastered</span></div>
-                    <div class="stat">1 <span>Live iOS App</span></div>
-                    <p>Location: Surat, Gujarat, India 🇮🇳</p>
-                    <p>Email: namanramphale2115@gmail.com</p>
-                    <p>Phone: +91-9106479647</p>
+                <div class="about-stats reveal">
+                    <div class="stat-item"><div class="stat-number" data-count="3">0+</div><div class="stat-label">Years Experience</div></div>
+                    <div class="stat-item"><div class="stat-number" data-count="10">0+</div><div class="stat-label">Projects Built</div></div>
+                    <div class="stat-item"><div class="stat-number" data-count="5">0+</div><div class="stat-label">Technologies</div></div>
+                    <div class="stat-item"><div class="stat-number" data-count="1">0</div><div class="stat-label">Live iOS App</div></div>
                 </div>
-                <div class="about-bio">
+                <div class="about-bio reveal">
                     <p>I'm a passionate Full-Stack and iOS Developer with expertise in building scalable web platforms and native mobile applications. I specialize in Swift/SwiftUI for iOS, ASP.NET Core for backend, and Firebase for real-time data. I love turning complex ideas into elegant, user-friendly products.</p>
                 </div>
             </div>
         </section>
-        
+
         <section id="skills" class="section">
-            <h2 class="section-title">Skills</h2>
+            <h2 class="section-title reveal">Skills</h2>
             <div class="skills-grid">
-                <div class="skill-card">
+                 <div class="skill-category-card reveal" style="transition-delay: 100ms;">
                     <h3>iOS Development</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Swift</span><span class="skill-tag">SwiftUI</span><span class="skill-tag">UIKit</span>
-                    </div>
+                    <div class="skill-tags"><span class="skill-tag">Swift</span><span class="skill-tag">SwiftUI</span><span class="skill-tag">UIKit</span><span class="skill-tag">Xcode</span><span class="skill-tag">Core Data</span><span class="skill-tag">AVFoundation</span></div>
                 </div>
-                 <div class="skill-card">
+                <div class="skill-category-card reveal" style="transition-delay: 200ms;">
                     <h3>Backend</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">ASP.NET Core</span><span class="skill-tag">C#</span><span class="skill-tag">Java EE</span><span class="skill-tag">PHP</span>
-                    </div>
+                    <div class="skill-tags"><span class="skill-tag">ASP.NET Core</span><span class="skill-tag">C#</span><span class="skill-tag">Java EE</span><span class="skill-tag">RESTful APIs</span><span class="skill-tag">Node.js</span></div>
                 </div>
-                 <div class="skill-card">
-                    <h3>Frontend</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">HTML5</span><span class="skill-tag">CSS3</span><span class="skill-tag">JavaScript</span><span class="skill-tag">Bootstrap</span>
-                    </div>
-                </div>
-                 <div class="skill-card">
+                <div class="skill-category-card reveal" style="transition-delay: 300ms;">
                     <h3>Databases & Cloud</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Firebase</span><span class="skill-tag">MySQL</span><span class="skill-tag">Cloud Firestore</span>
-                    </div>
+                    <div class="skill-tags"><span class="skill-tag">Firebase</span><span class="skill-tag">MySQL</span><span class="skill-tag">Cloud Firestore</span><span class="skill-tag">Firebase Auth</span></div>
+                </div>
+                <div class="skill-category-card reveal" style="transition-delay: 400ms;">
+                    <h3>Tools & Architecture</h3>
+                    <div class="skill-tags"><span class="skill-tag">Git</span><span class="skill-tag">GitHub</span><span class="skill-tag">Figma</span><span class="skill-tag">MVVM</span><span class="skill-tag">Microservices</span></div>
                 </div>
             </div>
         </section>
 
         <section id="projects" class="section">
-            <h2 class="section-title">Featured Projects</h2>
-            <div class="project-card hero-project">
+            <h2 class="section-title reveal">Featured Projects</h2>
+            <div class="project-card hero-project reveal">
                 <div class="project-info">
-                    <h3>My Campus - iOS Social App</h3>
-                    <p>My Campus is a campus social networking iOS application that lets students connect, share posts (photos + videos), and stay updated with campus life. Built with Swift/SwiftUI and Firebase backend.</p>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Swift</span><span class="skill-tag">SwiftUI</span><span class="skill-tag">Firebase</span>
-                    </div>
+                    <h3 class="project-title">My Campus — iOS Social App</h3>
+                    <p class="project-description">A campus social networking app for students to connect and share posts, photos, and videos. Built with Swift/SwiftUI and a Firebase backend.</p>
+                    <ul class="project-features">
+                        <li><i class="fas fa-check-circle"></i> Photo & Video Sharing</li>
+                        <li><i class="fas fa-check-circle"></i> Native iOS Media Picker</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time Feed & Interactions</li>
+                    </ul>
+                    <div class="project-tech-tags"><span class="tech-tag">Swift</span><span class="tech-tag">SwiftUI</span><span class="tech-tag">Firebase</span><span class="tech-tag">Firestore</span></div>
+                    <div class="hero-buttons" style="margin-top: 20px;"><a href="https://github.com/hinman2115" class="btn btn-secondary" target="_blank">GitHub Link</a></div>
                 </div>
                 <div class="iphone-mockup">
                     <div class="iphone-screen">
-                        <div class="carousel-container">
-                            <div class="carousel-slide" style="display:block;"><img src="https://via.placeholder.com/400x800/ff6b35/ffffff?text=Feed" alt="My Campus App Feed"></div>
-                            <div class="carousel-slide"><img src="https://via.placeholder.com/400x800/00c9a7/ffffff?text=New+Post" alt="My Campus New Post"></div>
-                             <div class="carousel-slide"><img src="https://via.placeholder.com/400x800/0A0A0F/ffffff?text=Profile" alt="My Campus Profile"></div>
-                        </div>
+                        <div class="carousel-slide active"><img src="https://i.imgur.com/U3a0x2F.png" alt="My Campus App Feed"></div>
+                        <div class="carousel-slide"><img src="https://i.imgur.com/zW1zL9I.png" alt="My Campus New Post"></div>
+                        <div class="carousel-slide"><img src="https://i.imgur.com/K3y2D5g.png" alt="My Campus Media Picker"></div>
                     </div>
                 </div>
             </div>
-            <!-- Other projects here -->
+            
+            <div class="other-projects-grid">
+                <div class="project-card reveal" style="transition-delay: 100ms;">
+                    <h3 class="project-title">Quick Commerce Platform <span class="status-badge ongoing">Ongoing</span></h3>
+                    <p class="project-description">Scalable area-based commerce with real-time inventory and a RESTful API architecture.</p>
+                    <div class="project-tech-tags"><span class="tech-tag">ASP.NET Core</span><span class="tech-tag">C#</span><span class="tech-tag">MySQL</span></div>
+                </div>
+                <div class="project-card reveal" style="transition-delay: 200ms;">
+                    <h3 class="project-title">Enterprise E-commerce</h3>
+                    <p class="project-description">Full-featured e-commerce platform with MVC architecture and secure payment integration.</p>
+                    <div class="project-tech-tags"><span class="tech-tag">Java EE</span><span class="tech-tag">MySQL</span><span class="tech-tag">JSP</span></div>
+                </div>
+                 <div class="project-card reveal" style="transition-delay: 300ms;">
+                    <h3 class="project-title">Flutter Chat App</h3>
+                    <p class="project-description">Cross-platform real-time messaging app with multimedia sharing and push notifications.</p>
+                    <div class="project-tech-tags"><span class="tech-tag">Flutter</span><span class="tech-tag">Dart</span><span class="tech-tag">Firebase</span></div>
+                </div>
+            </div>
         </section>
 
         <section id="contact" class="section">
-            <h2 class="section-title">Contact Me</h2>
-            <form class="contact-form">
-                <div class="form-group"><input type="text" placeholder="Name"></div>
-                <div class="form-group"><input type="email" placeholder="Email"></div>
-                <div class="form-group"><textarea rows="5" placeholder="Message"></textarea></div>
-                <button type="submit" class="btn btn-primary">Send Message</button>
-            </form>
+            <div class="contact-container reveal">
+                <h2 class="section-title">Get In Touch</h2>
+                <p>I'm open to new opportunities and collaborations. Feel free to reach out!</p>
+                <div class="contact-socials">
+                    <a href="https://github.com/hinman2115" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="mailto:namanramphale2115@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                    <a href="tel:+919106479647" aria-label="Phone"><i class="fas fa-phone"></i></a>
+                </div>
+            </div>
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Naman Ramphale. Designed & Developed by Naman Ramphale.</p>
-    </footer>
+    <footer><p>Designed & Developed by Naman Ramphale © 2025</p></footer>
 
     <script>
-    // Custom cursor
-    const cursor = document.querySelector('.cursor-glow');
-    document.addEventListener('mousemove', e => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
+    document.addEventListener('DOMContentLoaded', () => {
+        const cursor = document.querySelector('.cursor-glow');
+        const nav = document.querySelector('.main-nav');
+        const typewriterText = document.getElementById('typewriter-text');
+        const roles = ["Full-Stack Developer", "iOS Developer", "Mobile App Builder", "Firebase Enthusiast"];
+        let roleIndex = 0, charIndex = 0, isDeleting = false;
+
+        // Cursor
+        document.addEventListener('mousemove', e => {
+            if (!cursor.style.opacity) cursor.style.opacity = 1;
+            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        });
+
+        // Nav Scroll
+        window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+
+        // Typewriter
+        function type() {
+            const currentRole = roles[roleIndex], typeSpeed = isDeleting ? 40 : 120;
+            charIndex += isDeleting ? -1 : 1;
+            typewriterText.textContent = currentRole.substring(0, charIndex);
+            
+            if (!isDeleting && charIndex === currentRole.length) {
+                setTimeout(() => isDeleting = true, 2000);
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+            }
+            setTimeout(type, typeSpeed);
+        }
+        setTimeout(type, 500);
+
+        // Canvas Particles
+        const canvas = document.getElementById('particle-canvas'), ctx = canvas.getContext('2d');
+        let particles = [];
+        const setupCanvas = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+        class Particle {
+            constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*2+1; this.speedX = Math.random()*0.4-0.2; this.speedY = Math.random()*0.4-0.2; }
+            update() { this.x+=this.speedX; this.y+=this.speedY; if(this.size>0.2)this.size-=0.02; }
+            draw() { ctx.fillStyle = 'rgba(0, 201, 167, 0.7)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function handleParticles() {
+            for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); if(particles[i].size <= 0.2) { particles.splice(i, 1); i--; } }
+            while(particles.length < 60) particles.push(new Particle());
+        }
+        function animateParticles() { ctx.clearRect(0,0,canvas.width,canvas.height); handleParticles(); requestAnimationFrame(animateParticles); }
+        setupCanvas();
+        animateParticles();
+        window.addEventListener('resize', setupCanvas);
+        
+        // Intersection Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    const counter = entry.target.querySelector('.stat-number[data-count]');
+                    if (counter && !counter.classList.contains('counted')) {
+                        const target = +counter.dataset.count;
+                        const duration = 1500;
+                        let start = null;
+                        const step = (timestamp) => {
+                            if (!start) start = timestamp;
+                            const progress = Math.min((timestamp - start) / duration, 1);
+                            counter.innerText = Math.floor(progress * target);
+                            if (progress < 1) window.requestAnimationFrame(step);
+                            else counter.innerText = target + (counter.innerText.includes('Live') ? '' : '+');
+                        };
+                        window.requestAnimationFrame(step);
+                        counter.classList.add('counted');
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        
+        // iPhone Carousel
+        const slides = document.querySelectorAll('.carousel-slide');
+        let currentSlide = 0;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 3000);
     });
-    // Typewriter effect
-    const typewriterText = document.getElementById('typewriter-text');
-    const roles = ["Full-Stack Developer", "iOS Developer", "Mobile App Builder", "Firebase Enthusiast"];
-    let roleIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    function type() {
-        const currentRole = roles[roleIndex];
-        if (isDeleting) {
-            typewriterText.textContent = currentRole.substring(0, charIndex - 1);
-            charIndex--;
-        } else {
-            typewriterText.textContent = currentRole.substring(0, charIndex + 1);
-            charIndex++;
-        }
-        if (!isDeleting && charIndex === currentRole.length) {
-            isDeleting = true;
-            setTimeout(type, 2000);
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            roleIndex = (roleIndex + 1) % roles.length;
-            setTimeout(type, 500);
-        } else {
-            setTimeout(type, isDeleting ? 50 : 150);
-        }
-    }
-    document.addEventListener('DOMContentLoaded', () => setTimeout(type, 1000));
-    
-    // Canvas particle animation
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    let particles = [];
-    class Particle {
-        constructor(x, y, size, color, speedX, speedY) {
-            this.x = x; this.y = y; this.size = size; this.color = color; this.speedX = speedX; this.speedY = speedY;
-        }
-        update() {
-            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-            this.x += this.speedX;
-            this.y += this.speedY;
-        }
-        draw() {
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-    function initParticles() {
-        for (let i = 0; i < 60; i++) {
-            let size = Math.random() * 2 + 1;
-            let x = Math.random() * canvas.width;
-            let y = Math.random() * canvas.height;
-            let speedX = Math.random() * 0.4 - 0.2;
-            let speedY = Math.random() * 0.4 - 0.2;
-            particles.push(new Particle(x, y, size, 'rgba(0, 201, 167, 0.5)', speedX, speedY));
-        }
-    }
-    function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].draw();
-        }
-        requestAnimationFrame(animateParticles);
-    }
-    initParticles();
-    animateParticles();
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        particles = [];
-        initParticles();
-    });
-    // Carousel
-    let slideIndex = 0;
-    function showSlides() {
-        let slides = document.querySelectorAll('.carousel-slide');
-        for (let i = 0; i < slides.length; i++) {
-            slides[i].style.display = 'none';
-        }
-        slideIndex++;
-        if (slideIndex > slides.length) {slideIndex = 1}
-        slides[slideIndex-1].style.display = 'block';
-        setTimeout(showSlides, 3000); // Change image every 3 seconds
-    }
-    showSlides();
     </script>
 </body>
 </html>
