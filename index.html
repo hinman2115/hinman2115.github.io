@@ -7,21 +7,24 @@
 <meta name="description" content="Naman Ramphale, iOS Developer. Swift, SwiftUI, UIKit. Shipped apps: MMP, SpinStatz, LOOKEE." />
 <style>
   :root{
-    --bg: #F5F5F7;
-    --bg-elevated: #FFFFFF;
     --ink: #1D1D1F;
     --ink-soft: #6E6E73;
-    --line: #D2D2D7;
-    --swift-1: #FA7343;
-    --swift-2: #F5573B;
-    --blue: #0071E3;
-    --code-bg: #1D1D1F;
+    --ink-soft-2: rgba(255,255,255,0.72);
+    --line: rgba(255,255,255,0.5);
+    --blue: #0A84FF;
+    --indigo: #5E5CE6;
+    --teal: #30B0C7;
+    --mint: #63D48A;
+    --glass-bg: rgba(255,255,255,0.46);
+    --glass-bg-strong: rgba(255,255,255,0.62);
+    --glass-border: rgba(255,255,255,0.65);
+    --glass-shadow: 0 8px 32px rgba(31,38,60,0.14), inset 0 1px 0 rgba(255,255,255,0.5);
+    --code-bg: rgba(28,28,32,0.66);
     --code-ink: #F5F5F7;
     --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --radius-lg: 22px;
-    --radius-md: 14px;
-    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+    --radius-lg: 26px;
+    --radius-md: 16px;
   }
 
   *{ box-sizing: border-box; }
@@ -33,10 +36,37 @@
 
   body{
     margin: 0;
-    background: var(--bg);
     color: var(--ink);
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Liquid gradient mesh backdrop the glass panels refract against */
+  .mesh{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(10,132,255,0.55), transparent 42%),
+      radial-gradient(circle at 85% 15%, rgba(94,92,230,0.5), transparent 45%),
+      radial-gradient(circle at 25% 60%, rgba(48,176,199,0.42), transparent 46%),
+      radial-gradient(circle at 90% 78%, rgba(99,212,138,0.34), transparent 40%),
+      radial-gradient(circle at 50% 95%, rgba(10,132,255,0.3), transparent 45%),
+      linear-gradient(180deg, #EEF2F7 0%, #E7EDF5 100%);
+    background-repeat: no-repeat;
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  @keyframes drift{
+    0%{ filter: hue-rotate(0deg) saturate(1); }
+    100%{ filter: hue-rotate(8deg) saturate(1.08); }
+  }
+  .mesh::after{
+    content:"";
+    position:absolute; inset:0;
+    backdrop-filter: blur(60px);
   }
 
   a{ color: inherit; }
@@ -48,21 +78,36 @@
     padding: 0 24px;
   }
 
+  /* Reusable glass surface */
+  .glass{
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
   /* NAV */
   header.nav{
     position: sticky;
-    top: 0;
+    top: 12px;
     z-index: 50;
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    background: rgba(245,245,247,0.72);
-    border-bottom: 1px solid rgba(210,210,215,0.6);
+    margin: 12px auto 0;
+    max-width: 1032px;
+    padding: 0 24px;
   }
-  .nav-row{
+  .nav-inner{
     display:flex;
     align-items:center;
     justify-content: space-between;
-    height: 52px;
+    height: 54px;
+    padding: 0 18px;
+    border-radius: 980px;
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
   }
   .nav-mark{
     font-family: var(--mono);
@@ -75,12 +120,13 @@
   }
   .nav-mark .dot{
     width: 9px; height: 9px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--swift-1), var(--swift-2));
+    background: linear-gradient(135deg, var(--blue), var(--indigo));
     display:inline-block;
+    box-shadow: 0 0 0 4px rgba(10,132,255,0.14);
   }
   nav.links{
     display:flex;
-    gap: 28px;
+    gap: 26px;
     font-size: 13.5px;
     color: var(--ink-soft);
   }
@@ -92,17 +138,17 @@
   .nav-cta{
     font-size: 13px;
     font-weight: 600;
-    color: var(--blue);
+    color: white;
     text-decoration: none;
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: 980px;
+    background: linear-gradient(135deg, var(--blue), var(--indigo));
+    box-shadow: 0 4px 14px rgba(10,132,255,0.35);
   }
-  .nav-cta:hover{ text-decoration: underline; }
   @media (max-width: 680px){
     nav.links{ display:none; }
   }
 
-  /* Focus visibility */
   a:focus-visible, button:focus-visible{
     outline: 2px solid var(--blue);
     outline-offset: 3px;
@@ -111,19 +157,19 @@
 
   /* HERO */
   .hero{
-    padding: 72px 0 40px;
+    padding: 60px 0 40px;
     display: grid;
     grid-template-columns: 1.05fr 0.95fr;
-    gap: 48px;
+    gap: 40px;
     align-items: center;
   }
   @media (max-width: 860px){
-    .hero{ grid-template-columns: 1fr; padding-top: 44px; gap: 32px; }
+    .hero{ grid-template-columns: 1fr; padding-top: 40px; gap: 28px; }
   }
   .eyebrow{
     font-family: var(--mono);
     font-size: 12.5px;
-    color: var(--swift-2);
+    color: var(--indigo);
     letter-spacing: 0.02em;
     margin: 0 0 14px;
     font-weight: 600;
@@ -136,7 +182,7 @@
     font-weight: 700;
   }
   .hero h1 span{
-    background: linear-gradient(100deg, var(--swift-1), var(--swift-2));
+    background: linear-gradient(100deg, var(--blue), var(--indigo));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -160,30 +206,35 @@
     font-size: 14.5px;
     font-weight: 600;
     text-decoration: none;
-    padding: 12px 20px;
+    padding: 12px 22px;
     border-radius: 980px;
     border: 1px solid transparent;
     transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     cursor: pointer;
   }
   .btn-primary{
-    background: linear-gradient(100deg, var(--swift-1), var(--swift-2));
+    background: linear-gradient(135deg, var(--blue), var(--indigo));
     color: white;
-    box-shadow: 0 6px 16px rgba(245,87,59,0.28);
+    box-shadow: 0 8px 20px rgba(10,132,255,0.32);
   }
-  .btn-primary:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(245,87,59,0.34); }
+  .btn-primary:hover{ transform: translateY(-1px); box-shadow: 0 12px 26px rgba(10,132,255,0.4); }
   .btn-secondary{
-    background: var(--bg-elevated);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
     color: var(--ink);
-    border-color: var(--line);
+    border: 1px solid var(--glass-border);
   }
-  .btn-secondary:hover{ transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-secondary:hover{ transform: translateY(-1px); box-shadow: var(--glass-shadow); }
 
-  /* CODE CARD */
+  /* CODE CARD — frosted dark glass */
   .code-card{
     background: var(--code-bg);
+    -webkit-backdrop-filter: blur(30px) saturate(160%);
+    backdrop-filter: blur(30px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.14);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
+    box-shadow: 0 20px 44px rgba(10,20,40,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
     overflow: hidden;
   }
   .code-titlebar{
@@ -191,7 +242,8 @@
     align-items:center;
     gap: 8px;
     padding: 12px 16px;
-    background: #262625;
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   .code-titlebar .traffic{ width:11px; height:11px; border-radius:50%; }
   .traffic.r{ background:#FF5F57; }
@@ -212,53 +264,55 @@
     color: var(--code-ink);
     overflow-x: auto;
   }
-  .tok-kw{ color: #FA7343; }
-  .tok-type{ color: #5FD0FF; }
-  .tok-str{ color: #FC6A5D; }
-  .tok-comment{ color: #6C7986; font-style: italic; }
-  .tok-prop{ color: #67B7A4; }
-  .tok-fn{ color: #A167E6; }
+  .tok-kw{ color: #0A84FF; }
+  .tok-type{ color: #64D2FF; }
+  .tok-str{ color: #FF6961; }
+  .tok-comment{ color: #7A7A80; font-style: italic; }
+  .tok-prop{ color: #63D48A; }
+  .tok-fn{ color: #BF5AF2; }
   .caret{
     display:inline-block;
     width: 8px; height: 16px;
-    background: var(--swift-1);
+    background: var(--blue);
     margin-left: 2px;
     vertical-align: -3px;
     animation: blink 1.05s steps(1) infinite;
   }
   @keyframes blink{ 50%{ opacity: 0; } }
 
-  /* STATS STRIP */
-  .stats{
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-    padding: 28px 0;
-  }
+  /* STATS STRIP — glass pill row */
+  .stats{ padding: 24px 0; }
   .stats-row{
     display:grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 16px;
     text-align:center;
   }
   @media (max-width: 700px){
     .stats-row{ grid-template-columns: repeat(2, 1fr); }
   }
+  .stat{
+    padding: 18px 10px;
+    border-radius: var(--radius-md);
+  }
   .stat b{
     display:block;
-    font-size: 26px;
+    font-size: 24px;
     letter-spacing: -0.02em;
     font-weight: 700;
+    background: linear-gradient(135deg, var(--blue), var(--indigo));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .stat span{
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--ink-soft);
   }
 
   /* SECTION HEADERS */
-  section{ padding: 84px 0; }
-  .section-head{
-    margin-bottom: 40px;
-  }
+  section{ padding: 76px 0; }
+  .section-head{ margin-bottom: 36px; }
   .section-head .eyebrow{ margin-bottom: 8px; }
   .section-head h2{
     font-size: clamp(26px, 3.4vw, 34px);
@@ -274,30 +328,25 @@
   }
 
   /* PROJECTS */
-  .projects{
-    display: grid;
-    gap: 20px;
-  }
+  .projects{ display: grid; gap: 18px; }
   .project-card{
     display: grid;
     grid-template-columns: 96px 1fr auto;
     gap: 22px;
     align-items: center;
-    background: var(--bg-elevated);
-    border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     padding: 26px;
     text-decoration: none;
     color: inherit;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     opacity: 0;
     transform: translateY(14px);
   }
   .project-card.reveal{ opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s ease; }
   .project-card:hover, .project-card:focus-visible{
     transform: translateY(-3px);
-    box-shadow: var(--shadow);
-    border-color: transparent;
+    background: var(--glass-bg-strong);
+    box-shadow: 0 16px 40px rgba(31,38,60,0.18), inset 0 1px 0 rgba(255,255,255,0.55);
   }
   @media (max-width: 700px){
     .project-card{ grid-template-columns: 64px 1fr; }
@@ -307,12 +356,12 @@
     width: 96px; height: 96px;
     border-radius: 22px;
     display:flex; align-items:center; justify-content:center;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), 0 4px 14px rgba(0,0,0,0.12);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), 0 6px 18px rgba(0,0,0,0.14);
   }
   @media (max-width: 700px){ .app-icon{ width:64px; height:64px; border-radius:16px; } }
-  .icon-mmp{ background: linear-gradient(150deg, #2E7DF6, #0043C4); }
-  .icon-spin{ background: linear-gradient(150deg, #FF5FA0, #B4118F); }
-  .icon-lookee{ background: linear-gradient(150deg, #2FD68C, #0E8F5B); }
+  .icon-mmp{ background: linear-gradient(150deg, #0A84FF, #4C6EF5); }
+  .icon-spin{ background: linear-gradient(150deg, #5E5CE6, #BF5AF2); }
+  .icon-lookee{ background: linear-gradient(150deg, #30B0C7, #63D48A); }
 
   .card-body h3{
     margin: 0 0 4px;
@@ -336,34 +385,32 @@
     color: var(--ink-soft);
     max-width: 58ch;
   }
-  .chips{
-    display:flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .chips{ display:flex; gap: 8px; flex-wrap: wrap; }
   .chip{
     font-family: var(--mono);
     font-size: 11.5px;
     padding: 4px 10px;
     border-radius: 980px;
-    background: #EFEFF1;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.6);
     color: var(--ink-soft);
   }
   .card-go{
     width: 34px; height: 34px;
     border-radius: 50%;
-    border: 1px solid var(--line);
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.4);
     display:flex; align-items:center; justify-content:center;
     color: var(--ink-soft);
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
   }
-  .project-card:hover .card-go{ background: var(--blue); color: white; border-color: var(--blue); }
+  .project-card:hover .card-go{ background: linear-gradient(135deg, var(--blue), var(--indigo)); color: white; }
 
   /* ABOUT / SKILLS */
   .about-grid{
     display:grid;
     grid-template-columns: 1.1fr 1fr;
-    gap: 48px;
+    gap: 44px;
     align-items:start;
   }
   @media (max-width: 800px){ .about-grid{ grid-template-columns: 1fr; } }
@@ -373,27 +420,22 @@
     color: var(--ink-soft);
     margin: 0 0 16px;
   }
-  .skills{
-    display:flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
+  .skills{ display:flex; flex-wrap: wrap; gap: 10px; }
   .skill{
     font-size: 13.5px;
     font-weight: 600;
-    padding: 9px 16px;
-    border-radius: 12px;
-    background: var(--bg-elevated);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow);
+    padding: 10px 16px;
+    border-radius: 14px;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    border: 1px solid var(--glass-border);
   }
 
   /* CONTACT */
   .contact-card{
-    background: var(--bg-elevated);
     border-radius: var(--radius-lg);
-    border: 1px solid var(--line);
-    padding: 44px;
+    padding: 46px;
     text-align:center;
   }
   .contact-card h2{
@@ -406,12 +448,7 @@
     margin: 0 0 28px;
     font-size: 15.5px;
   }
-  .contact-row{
-    display:flex;
-    justify-content:center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+  .contact-row{ display:flex; justify-content:center; gap: 12px; flex-wrap: wrap; }
 
   footer{
     padding: 32px 0 48px;
@@ -424,8 +461,10 @@
 </head>
 <body>
 
+<div class="mesh" aria-hidden="true"></div>
+
 <header class="nav">
-  <div class="wrap nav-row">
+  <div class="nav-inner">
     <div class="nav-mark"><span class="dot"></span>Naman Ramphale</div>
     <nav class="links">
       <a href="#projects">Projects</a>
@@ -468,12 +507,12 @@
   </div>
 </main>
 
-<div class="stats">
-  <div class="wrap stats-row">
-    <div class="stat"><b>3</b><span>Apps shipped</span></div>
-    <div class="stat"><b>1 yr</b><span>Professional experience</span></div>
-    <div class="stat"><b>Swift</b><span>UIKit &amp; SwiftUI</span></div>
-    <div class="stat"><b>REST</b><span>APIs &amp; JSON parsing</span></div>
+<div class="wrap stats">
+  <div class="stats-row">
+    <div class="stat glass"><b>3</b><span>Apps shipped</span></div>
+    <div class="stat glass"><b>1 yr</b><span>Professional experience</span></div>
+    <div class="stat glass"><b>Swift</b><span>UIKit &amp; SwiftUI</span></div>
+    <div class="stat glass"><b>REST</b><span>APIs &amp; JSON parsing</span></div>
   </div>
 </div>
 
@@ -486,7 +525,7 @@
 
   <div class="projects">
 
-    <a class="project-card" href="https://apps.apple.com/us/app/mobile-marketing-platform/id6451174652" target="_blank" rel="noopener">
+    <a class="project-card glass" href="https://apps.apple.com/us/app/mobile-marketing-platform/id6451174652" target="_blank" rel="noopener">
       <div class="app-icon icon-mmp" aria-hidden="true">
         <svg width="42" height="42" viewBox="0 0 24 24" fill="none"><path d="M4 14v-2a2 2 0 0 1 2-2h2l6-4v16l-6-4H6a2 2 0 0 1-2-2Z" fill="white" fill-opacity="0.95"/><path d="M17 9.5c1 .8 1 4.2 0 5" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
       </div>
@@ -501,7 +540,7 @@
       <div class="card-go" aria-hidden="true">↗</div>
     </a>
 
-    <a class="project-card" href="https://apps.apple.com/us/app/spinstatz/id1458997474" target="_blank" rel="noopener">
+    <a class="project-card glass" href="https://apps.apple.com/us/app/spinstatz/id1458997474" target="_blank" rel="noopener">
       <div class="app-icon icon-spin" aria-hidden="true">
         <svg width="42" height="42" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="white" stroke-width="1.6"/><circle cx="12" cy="12" r="2.4" fill="white"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
       </div>
@@ -516,7 +555,7 @@
       <div class="card-go" aria-hidden="true">↗</div>
     </a>
 
-    <a class="project-card" href="https://apps.apple.com/us/app/lookee/id6756679054" target="_blank" rel="noopener">
+    <a class="project-card glass" href="https://apps.apple.com/us/app/lookee/id6756679054" target="_blank" rel="noopener">
       <div class="app-icon icon-lookee" aria-hidden="true">
         <svg width="42" height="42" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-6 3 12 2-8 1.5 2H21" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
@@ -565,7 +604,7 @@
 </section>
 
 <section id="contact" class="wrap">
-  <div class="contact-card">
+  <div class="contact-card glass">
     <h2>Let's build something.</h2>
     <p>Open to iOS developer roles and freelance work.</p>
     <div class="contact-row">
@@ -580,7 +619,6 @@
 <footer>Naman Ramphale · Built with Swift in mind</footer>
 
 <script>
-  // Scroll reveal for project cards
   var cards = document.querySelectorAll('.project-card');
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function(entries){
